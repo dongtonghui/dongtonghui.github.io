@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用 Hermes Agent 打造个人 AI 中枢</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Creative Mode — Warm cream + multi-color geo
+           =========================================== */
+        :root {
+            --bg-primary: #f5f0e8;
+            --bg-card: #ffffff;
+            --bg-card-alt: #faf8f3;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --accent-green: #4ade80;
+            --accent-pink: #f472b6;
+            --accent-orange: #fb923c;
+            --accent-yellow: #facc15;
+            --accent-teal: #2dd4bf;
+            --accent-violet: #a78bfa;
+
+            --font-display: 'Archivo Black', 'Noto Sans SC', sans-serif;
+            --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Noto Sans SC', monospace;
+
+            --title-size: 80px;
+            --subtitle-size: 32px;
+            --body-size: 26px;
+            --label-size: 16px;
+
+            --slide-padding: 100px;
+            --content-gap: 36px;
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===========================================
+           VIEWPORT BASE CSS (MANDATORY)
+           =========================================== */
+        html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg-primary); }
+        .deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--bg-primary); }
+        .deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--bg-primary); }
+        .slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; display: block; visibility: hidden; opacity: 0; pointer-events: none; background: var(--bg-primary); }
+        .slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+        img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+        .deck-controls { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000; }
+        @media print { html, body { width: 1920px; height: auto; overflow: visible; background: #fff; } .deck-viewport { position: static; overflow: visible; background: #fff; } .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; } .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; } .slide:last-child { break-after: auto; page-break-after: auto; } .deck-controls { display: none !important; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; } }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        .reveal-left { opacity: 0; transform: translateX(-50px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
+        .slide.visible .reveal-left { opacity: 1; transform: translateX(0); }
+        .reveal-left:nth-child(1) { transition-delay: 0.1s; }
+        .reveal-left:nth-child(2) { transition-delay: 0.2s; }
+        .reveal-left:nth-child(3) { transition-delay: 0.3s; }
+        .reveal-left:nth-child(4) { transition-delay: 0.4s; }
+
+        .reveal-scale { opacity: 0; transform: scale(0.92); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
+        .slide.visible .reveal-scale { opacity: 1; transform: scale(1); }
+
+        /* ===========================================
+           SHARED COMPONENTS
+           =========================================== */
+        .eyebrow { font-family: var(--font-body); font-size: var(--label-size); font-weight: 700; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; }
+        .section-num { font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.1em; }
+
+        .slide-title { font-family: var(--font-display); font-size: var(--title-size); font-weight: 900; color: var(--text-primary); line-height: 1.08; }
+        .slide-subtitle { font-family: var(--font-body); font-size: var(--subtitle-size); font-weight: 400; color: var(--text-secondary); line-height: 1.5; }
+        .body-text { font-family: var(--font-body); font-size: var(--body-size); font-weight: 400; color: var(--text-secondary); line-height: 1.7; }
+
+        .meta { position: absolute; right: 80px; bottom: 50px; font-family: var(--font-body); font-size: 13px; color: var(--text-muted); }
+        .page-num { position: absolute; left: 80px; bottom: 50px; font-family: var(--font-body); font-size: 13px; color: var(--text-muted); }
+
+        /* Cards */
+        .card { background: var(--bg-card); border-radius: 20px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .card-title { font-family: var(--font-body); font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+        .card-text { font-family: var(--font-body); font-size: 20px; font-weight: 400; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Geometric shapes */
+        .geo-shape { position: absolute; pointer-events: none; }
+
+        /* ===========================================
+           SLIDE 1: TITLE
+           =========================================== */
+        .slide-1 .geo-green { left: -60px; top: -80px; width: 320px; height: 320px; background: var(--accent-green); border-radius: 40px; transform: rotate(-15deg); opacity: 0.9; }
+        .slide-1 .geo-pink { right: 100px; bottom: -60px; width: 280px; height: 280px; background: var(--accent-pink); border-radius: 50%; opacity: 0.85; }
+        .slide-1 .geo-orange { right: 60px; top: 120px; width: 140px; height: 140px; background: var(--accent-orange); border-radius: 20px; transform: rotate(25deg); opacity: 0.9; }
+        .slide-1 .geo-yellow { left: 300px; bottom: 80px; width: 100px; height: 100px; background: var(--accent-yellow); border-radius: 50%; opacity: 0.8; }
+        .slide-1 .content { position: absolute; left: 120px; top: 50%; transform: translateY(-50%); max-width: 1000px; }
+        .slide-1 .eyebrow { margin-bottom: 32px; }
+        .slide-1 .slide-title { font-size: 96px; margin-bottom: 40px; }
+        .slide-1 .slide-subtitle { font-size: 28px; }
+
+        /* ===========================================
+           SLIDE 2: AGENDA
+           =========================================== */
+        .slide-2 .geo-green { right: -40px; top: -40px; width: 180px; height: 180px; background: var(--accent-green); border-radius: 30px; transform: rotate(20deg); opacity: 0.7; }
+        .slide-2 .geo-pink { left: 60px; bottom: -30px; width: 120px; height: 120px; background: var(--accent-pink); border-radius: 50%; opacity: 0.6; }
+        .slide-2 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-2 .slide-title { font-size: 64px; margin-bottom: 60px; }
+        .agenda-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+        .agenda-item { display: flex; align-items: flex-start; gap: 20px; padding: 28px; background: var(--bg-card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .agenda-num { font-family: var(--font-display); font-size: 40px; font-weight: 900; color: var(--accent-green); line-height: 1; min-width: 60px; }
+        .agenda-text { font-family: var(--font-body); font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.4; }
+        .agenda-desc { font-family: var(--font-body); font-size: 17px; font-weight: 400; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+
+        /* ===========================================
+           SLIDE 3: AI 赋能环节
+           =========================================== */
+        .slide-3 .geo-orange { right: -50px; top: 50%; width: 160px; height: 160px; background: var(--accent-orange); border-radius: 50%; transform: translateY(-50%); opacity: 0.6; }
+        .slide-3 .geo-yellow { left: -30px; bottom: 60px; width: 100px; height: 100px; background: var(--accent-yellow); border-radius: 20px; transform: rotate(-20deg); opacity: 0.7; }
+        .slide-3 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-3 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .usecase-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+        .usecase-card { padding: 36px; background: var(--bg-card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border-top: 5px solid var(--accent-green); }
+        .usecase-card:nth-child(2) { border-top-color: var(--accent-pink); }
+        .usecase-card:nth-child(3) { border-top-color: var(--accent-orange); }
+        .usecase-card:nth-child(4) { border-top-color: var(--accent-teal); }
+        .usecase-icon { font-size: 40px; margin-bottom: 16px; }
+        .usecase-title { font-family: var(--font-body); font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+        .usecase-desc { font-family: var(--font-body); font-size: 19px; font-weight: 400; color: var(--text-secondary); line-height: 1.6; }
+
+        /* ===========================================
+           SLIDE 4: 工具选择依据
+           =========================================== */
+        .slide-4 .geo-pink { left: -40px; top: 40%; width: 140px; height: 140px; background: var(--accent-pink); border-radius: 30px; transform: rotate(15deg); opacity: 0.6; }
+        .slide-4 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-4 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .criteria-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+        .criteria-card { padding: 40px; background: var(--bg-card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; }
+        .criteria-card:nth-child(1) { border-bottom: 5px solid var(--accent-green); }
+        .criteria-card:nth-child(2) { border-bottom: 5px solid var(--accent-pink); }
+        .criteria-card:nth-child(3) { border-bottom: 5px solid var(--accent-orange); }
+        .criteria-icon { font-size: 48px; margin-bottom: 20px; }
+        .criteria-title { font-family: var(--font-body); font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+        .criteria-desc { font-family: var(--font-body); font-size: 18px; font-weight: 400; color: var(--text-secondary); line-height: 1.6; }
+
+        /* ===========================================
+           SLIDE 5: 为什么是 Hermes
+           =========================================== */
+        .slide-5 .geo-teal { right: 80px; top: -40px; width: 120px; height: 120px; background: var(--accent-teal); border-radius: 50%; opacity: 0.6; }
+        .slide-5 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-5 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .hermes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+        .hermes-card { padding: 32px; background: var(--bg-card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; gap: 20px; align-items: flex-start; }
+        .hermes-check { font-size: 28px; line-height: 1; }
+        .hermes-check:nth-child(1) { color: var(--accent-green); }
+        .hermes-card:nth-child(2) .hermes-check { color: var(--accent-pink); }
+        .hermes-card:nth-child(3) .hermes-check { color: var(--accent-orange); }
+        .hermes-card:nth-child(4) .hermes-check { color: var(--accent-teal); }
+        .hermes-title { font-family: var(--font-body); font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .hermes-desc { font-family: var(--font-body); font-size: 18px; font-weight: 400; color: var(--text-secondary); line-height: 1.6; }
+
+        /* ===========================================
+           SLIDE 6: 技能选择依据
+           =========================================== */
+        .slide-6 .geo-yellow { left: -30px; top: 60px; width: 100px; height: 100px; background: var(--accent-yellow); border-radius: 20px; transform: rotate(-15deg); opacity: 0.7; }
+        .slide-6 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-6 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .skill-choose-wrap { display: flex; gap: 40px; height: calc(100% - 140px); }
+        .skill-choose-card { flex: 1; padding: 48px; background: var(--bg-card); border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; flex-direction: column; justify-content: center; }
+        .skill-choose-card:nth-child(1) { border-left: 6px solid var(--accent-green); }
+        .skill-choose-card:nth-child(2) { border-left: 6px solid var(--accent-pink); }
+        .skill-choose-num { font-family: var(--font-display); font-size: 64px; font-weight: 900; color: var(--accent-green); margin-bottom: 24px; }
+        .skill-choose-card:nth-child(2) .skill-choose-num { color: var(--accent-pink); }
+        .skill-choose-title { font-family: var(--font-body); font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+        .skill-choose-desc { font-family: var(--font-body); font-size: 22px; font-weight: 400; color: var(--text-secondary); line-height: 1.7; }
+
+        /* ===========================================
+           SLIDE 7: 安装 — 本地
+           =========================================== */
+        .slide-7 .geo-orange { right: -40px; bottom: 80px; width: 160px; height: 160px; background: var(--accent-orange); border-radius: 50%; opacity: 0.5; }
+        .slide-7 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-7 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .install-wrap { display: flex; gap: 40px; }
+        .install-card { flex: 1; padding: 40px; background: var(--bg-card); border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .install-card:nth-child(1) { border-top: 5px solid var(--accent-green); }
+        .install-card:nth-child(2) { border-top: 5px solid var(--accent-pink); }
+        .install-label { font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
+        .install-title { font-family: var(--font-body); font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 24px; }
+        .install-step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+        .install-step-num { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--accent-green); min-width: 36px; }
+        .install-card:nth-child(2) .install-step-num { color: var(--accent-pink); }
+        .install-step-text { font-family: var(--font-body); font-size: 20px; font-weight: 400; color: var(--text-secondary); line-height: 1.5; }
+        .install-code { font-family: var(--font-mono); font-size: 15px; color: var(--text-primary); background: var(--bg-primary); padding: 4px 12px; border-radius: 8px; }
+
+        /* ===========================================
+           SLIDE 8: 安装 — 云端
+           =========================================== */
+        .slide-8 .geo-teal { left: 50%; top: -30px; width: 100px; height: 100px; background: var(--accent-teal); border-radius: 20px; transform: rotate(20deg) translateX(-50%); opacity: 0.6; }
+        .slide-8 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-8 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .cloud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+        .cloud-card { padding: 40px; background: var(--bg-card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; }
+        .cloud-card:nth-child(1) { border-bottom: 5px solid var(--accent-green); }
+        .cloud-card:nth-child(2) { border-bottom: 5px solid var(--accent-pink); }
+        .cloud-card:nth-child(3) { border-bottom: 5px solid var(--accent-orange); }
+        .cloud-icon { font-size: 52px; margin-bottom: 20px; }
+        .cloud-title { font-family: var(--font-body); font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+        .cloud-desc { font-family: var(--font-body); font-size: 18px; font-weight: 400; color: var(--text-secondary); line-height: 1.6; }
+
+        /* ===========================================
+           SLIDE 9: 最佳实践 — Reddit
+           =========================================== */
+        .slide-9 .geo-pink { right: -30px; top: 100px; width: 120px; height: 120px; background: var(--accent-pink); border-radius: 50%; opacity: 0.5; }
+        .slide-9 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-9 .slide-title { font-size: 64px; margin-bottom: 40px; }
+        .practice-wrap { display: flex; gap: 50px; }
+        .practice-left { flex: 1; }
+        .practice-right { flex: 1; }
+        .practice-label { font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px; }
+        .practice-title { font-family: var(--font-body); font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+        .practice-desc { font-family: var(--font-body); font-size: 20px; font-weight: 400; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+        .practice-flow { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .flow-step { padding: 12px 20px; background: var(--bg-card); border-radius: 12px; font-family: var(--font-body); font-size: 16px; font-weight: 700; color: var(--text-primary); white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .flow-arrow { color: var(--accent-green); font-size: 20px; font-weight: 900; }
+        .practice-tool { display: inline-block; font-family: var(--font-mono); font-size: 15px; color: var(--text-primary); background: var(--bg-primary); padding: 10px 18px; border-radius: 10px; margin-top: 16px; }
+
+        /* ===========================================
+           SLIDE 10: 最佳实践 — PRD 撰写
+           =========================================== */
+        .slide-10 .geo-green { left: -40px; bottom: 60px; width: 140px; height: 140px; background: var(--accent-green); border-radius: 30px; transform: rotate(-20deg); opacity: 0.5; }
+        .slide-10 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-10 .slide-title { font-size: 64px; margin-bottom: 40px; }
+
+        /* ===========================================
+           SLIDE 11: 最佳实践 — Copy Review
+           =========================================== */
+        .slide-11 .geo-orange { right: 60px; top: -30px; width: 100px; height: 100px; background: var(--accent-orange); border-radius: 20px; transform: rotate(15deg); opacity: 0.6; }
+        .slide-11 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-11 .slide-title { font-size: 64px; margin-bottom: 40px; }
+
+        /* ===========================================
+           SLIDE 12: 最佳实践 — 每日复盘
+           =========================================== */
+        .slide-12 .geo-yellow { right: -20px; bottom: 40px; width: 100px; height: 100px; background: var(--accent-yellow); border-radius: 50%; opacity: 0.6; }
+        .slide-12 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-12 .slide-title { font-size: 64px; margin-bottom: 40px; }
+        .review-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .review-card { padding: 32px 24px; background: var(--bg-card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; }
+        .review-card:nth-child(1) { border-top: 5px solid var(--accent-green); }
+        .review-card:nth-child(2) { border-top: 5px solid var(--accent-pink); }
+        .review-card:nth-child(3) { border-top: 5px solid var(--accent-orange); }
+        .review-card:nth-child(4) { border-top: 5px solid var(--accent-teal); }
+        .review-icon { font-size: 40px; margin-bottom: 16px; }
+        .review-title { font-family: var(--font-body); font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+        .review-desc { font-family: var(--font-body); font-size: 16px; font-weight: 400; color: var(--text-secondary); line-height: 1.5; }
+
+        /* ===========================================
+           SLIDE 13: 技能进化
+           =========================================== */
+        .slide-13 .geo-violet { left: 50%; top: -40px; width: 140px; height: 140px; background: var(--accent-violet); border-radius: 50%; transform: translateX(-50%); opacity: 0.5; }
+        .slide-13 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-13 .slide-title { font-size: 64px; margin-bottom: 40px; }
+        .darwin-wrap { display: flex; gap: 50px; align-items: center; }
+        .darwin-left { flex: 1; }
+        .darwin-right { flex: 1; }
+        .darwin-visual { width: 100%; height: 380px; background: var(--bg-card); border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .darwin-visual::before { content: ''; position: absolute; width: 300px; height: 300px; background: var(--accent-violet); border-radius: 50%; filter: blur(80px); opacity: 0.3; }
+        .darwin-visual-text { font-family: var(--font-display); font-size: 48px; font-weight: 900; color: var(--accent-violet); position: relative; z-index: 1; }
+        .darwin-desc { font-family: var(--font-body); font-size: 22px; font-weight: 400; color: var(--text-secondary); line-height: 1.8; }
+
+        /* ===========================================
+           SLIDE 14: 其它技巧
+           =========================================== */
+        .slide-14 .geo-teal { left: -30px; top: 50%; width: 120px; height: 120px; background: var(--accent-teal); border-radius: 20px; transform: translateY(-50%) rotate(20deg); opacity: 0.5; }
+        .slide-14 .content { position: absolute; left: 120px; top: 100px; right: 120px; bottom: 100px; }
+        .slide-14 .slide-title { font-size: 64px; margin-bottom: 50px; }
+        .tips-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+        .tips-card { padding: 40px; background: var(--bg-card); border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .tips-card:nth-child(1) { border-left: 6px solid var(--accent-green); }
+        .tips-card:nth-child(2) { border-left: 6px solid var(--accent-pink); }
+        .tips-icon { font-size: 40px; margin-bottom: 16px; }
+        .tips-title { font-family: var(--font-body); font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+        .tips-desc { font-family: var(--font-body); font-size: 20px; font-weight: 400; color: var(--text-secondary); line-height: 1.7; }
+        .tips-link { font-family: var(--font-mono); font-size: 15px; color: var(--accent-orange); margin-top: 12px; display: inline-block; text-decoration: none; }
+
+        /* ===========================================
+           SLIDE 15: CLOSING
+           =========================================== */
+        .slide-15 .geo-green { left: -60px; top: -80px; width: 320px; height: 320px; background: var(--accent-green); border-radius: 40px; transform: rotate(-15deg); opacity: 0.9; }
+        .slide-15 .geo-pink { right: 100px; bottom: -60px; width: 280px; height: 280px; background: var(--accent-pink); border-radius: 50%; opacity: 0.85; }
+        .slide-15 .geo-orange { right: 60px; top: 120px; width: 140px; height: 140px; background: var(--accent-orange); border-radius: 20px; transform: rotate(25deg); opacity: 0.9; }
+        .slide-15 .geo-yellow { left: 300px; bottom: 80px; width: 100px; height: 100px; background: var(--accent-yellow); border-radius: 50%; opacity: 0.8; }
+        .slide-15 .content { position: absolute; left: 120px; top: 50%; transform: translateY(-50%); max-width: 1000px; }
+        .slide-15 .slide-title { font-size: 80px; margin-bottom: 30px; }
+        .slide-15 .slide-subtitle { font-size: 28px; margin-bottom: 50px; }
+        .cta-box { display: inline-block; padding: 20px 48px; background: var(--text-primary); color: var(--bg-primary); font-family: var(--font-body); font-size: 22px; font-weight: 700; border-radius: 16px; }
+
+        /* ===========================================
+           EDIT MODE
+           =========================================== */
+        .edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+        .edit-toggle { position: fixed; top: 16px; left: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--text-primary); color: var(--bg-primary); border: none; font-size: 20px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 10001; display: flex; align-items: center; justify-content: center; }
+        .edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+        [contenteditable="true"] { outline: 2px dashed var(--accent-green); outline-offset: 4px; }
+    </style>
+</head>
+<body>
+    <div class="deck-viewport">
+        <main class="deck-stage" id="deckStage">
+
+            <!-- ===== SLIDE 1: TITLE ===== -->
+            <section class="slide slide-1 active">
+                <div class="geo-shape geo-green"></div>
+                <div class="geo-shape geo-pink"></div>
+                <div class="geo-shape geo-orange"></div>
+                <div class="geo-shape geo-yellow"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">AI 工作流实战指南</div>
+                    <div class="slide-title reveal">用 Hermes Agent<br>打造个人 AI 中枢</div>
+                    <div class="slide-subtitle reveal">从 Reddit 舆情分析到 PRD 撰写 · 从 Demo 生成到每日复盘</div>
+                </div>
+                <div class="meta reveal">Steven · 2026</div>
+            </section>
+
+            <!-- ===== SLIDE 2: AGENDA ===== -->
+            <section class="slide slide-2">
+                <div class="geo-shape geo-green"></div>
+                <div class="geo-shape geo-pink"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">AGENDA</div>
+                    <div class="slide-title reveal">今天聊什么</div>
+                    <div class="agenda-grid">
+                        <div class="agenda-item reveal">
+                            <div class="agenda-num">01</div>
+                            <div>
+                                <div class="agenda-text">哪些环节需要 AI 赋能</div>
+                                <div class="agenda-desc">Reddit 舆情、PRD 撰写、Demo 生成、每日复盘</div>
+                            </div>
+                        </div>
+                        <div class="agenda-item reveal">
+                            <div class="agenda-num">02</div>
+                            <div>
+                                <div class="agenda-text">选择怎样的工具</div>
+                                <div class="agenda-desc">选择依据、为什么是 Hermes、技能挑选逻辑</div>
+                            </div>
+                        </div>
+                        <div class="agenda-item reveal">
+                            <div class="agenda-num">03</div>
+                            <div>
+                                <div class="agenda-text">如何安装部署</div>
+                                <div class="agenda-desc">本地安装、云端 Docker 部署、宝塔面板</div>
+                            </div>
+                        </div>
+                        <div class="agenda-item reveal">
+                            <div class="agenda-num">04</div>
+                            <div>
+                                <div class="agenda-text">最佳实践与技巧</div>
+                                <div class="agenda-desc">真实场景案例、技能进化、高阶技巧</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">02 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 3: AI 赋能环节 ===== -->
+            <section class="slide slide-3">
+                <div class="geo-shape geo-orange"></div>
+                <div class="geo-shape geo-yellow"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 01</div>
+                    <div class="slide-title reveal">哪些环节需要 AI 赋能</div>
+                    <div class="usecase-grid">
+                        <div class="usecase-card reveal">
+                            <div class="usecase-icon">📊</div>
+                            <div class="usecase-title">Reddit 舆情分析</div>
+                            <div class="usecase-desc">指定版块 + 关键词，自动抓取、汇总、提炼用户痛点与情绪信号</div>
+                        </div>
+                        <div class="usecase-card reveal">
+                            <div class="usecase-icon">📝</div>
+                            <div class="usecase-title">PRD 撰写</div>
+                            <div class="usecase-desc">功能模块拆解、交叉评审、整合输出、附带 UI Demo 设计</div>
+                        </div>
+                        <div class="usecase-card reveal">
+                            <div class="usecase-icon">🎨</div>
+                            <div class="usecase-title">Demo 生成</div>
+                            <div class="usecase-desc">一句话描述需求，自动生成可交互 HTML 原型与架构配图</div>
+                        </div>
+                        <div class="usecase-card reveal">
+                            <div class="usecase-icon">🔄</div>
+                            <div class="usecase-title">每日复盘</div>
+                            <div class="usecase-desc">自动汇总当日工作、提取关键决策、生成明日优先级建议</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">03 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 4: 工具选择依据 ===== -->
+            <section class="slide slide-4">
+                <div class="geo-shape geo-pink"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 02</div>
+                    <div class="slide-title reveal">选择工具的三大依据</div>
+                    <div class="criteria-grid">
+                        <div class="criteria-card reveal">
+                            <div class="criteria-icon">🧰</div>
+                            <div class="criteria-title">足够全能</div>
+                            <div class="criteria-desc">不局限某个特定模型<br>技能扩展性强<br>可自由组合工作流</div>
+                        </div>
+                        <div class="criteria-card reveal">
+                            <div class="criteria-icon">☁️</div>
+                            <div class="criteria-title">多端在线</div>
+                            <div class="criteria-desc">云端 7×24h 运行<br>Web / 钉钉 / 飞书多端同步<br>随时随地触发任务</div>
+                        </div>
+                        <div class="criteria-card reveal">
+                            <div class="criteria-icon">🔧</div>
+                            <div class="criteria-title">避免黑盒</div>
+                            <div class="criteria-desc">便宜模型 + 可控技能<br>也能得到更好效果<br>过程可调、结果可追踪</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">04 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 5: 为什么是 Hermes ===== -->
+            <section class="slide slide-5">
+                <div class="geo-shape geo-teal"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 02</div>
+                    <div class="slide-title reveal">为什么是 Hermes</div>
+                    <div class="hermes-grid">
+                        <div class="hermes-card reveal">
+                            <div class="hermes-check">✓</div>
+                            <div>
+                                <div class="hermes-title">完全免费</div>
+                                <div class="hermes-desc">开源框架，零订阅费，自有 API Key 即可运行</div>
+                            </div>
+                        </div>
+                        <div class="hermes-card reveal">
+                            <div class="hermes-check">✓</div>
+                            <div>
+                                <div class="hermes-title">丰富的 Skill 支持</div>
+                                <div class="hermes-desc">50+ 内置技能覆盖研究、写作、设计、开发、运维全场景</div>
+                            </div>
+                        </div>
+                        <div class="hermes-card reveal">
+                            <div class="hermes-check">✓</div>
+                            <div>
+                                <div class="hermes-title">多消息渠道</div>
+                                <div class="hermes-desc">WebUI、Telegram、Discord、钉钉、飞书，一处配置全端触达</div>
+                            </div>
+                        </div>
+                        <div class="hermes-card reveal">
+                            <div class="hermes-check">✓</div>
+                            <div>
+                                <div class="hermes-title">自主任务 & 自迭代</div>
+                                <div class="hermes-desc">Cron 定时任务 + Darwin 技能自进化，越用越聪明</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">05 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 6: 技能选择依据 ===== -->
+            <section class="slide slide-6">
+                <div class="geo-shape geo-yellow"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 02</div>
+                    <div class="slide-title reveal">选择技能的依据</div>
+                    <div class="skill-choose-wrap">
+                        <div class="skill-choose-card reveal">
+                            <div class="skill-choose-num">01</div>
+                            <div class="skill-choose-title">能直接干活的技能</div>
+                            <div class="skill-choose-desc">优先选择有明确输入输出、能独立完成端到端任务的技能。例如 reddit-community-research 能自动完成「爬取 → 分析 → 汇总」全流程。</div>
+                        </div>
+                        <div class="skill-choose-card reveal">
+                            <div class="skill-choose-num">02</div>
+                            <div class="skill-choose-title">能帮你优化技能的技能</div>
+                            <div class="skill-choose-desc">选择能反哺自身工作流的技能。例如 darwin-skill 能自动评估、优化你的 Skill 文件，形成「越用越强」的飞轮。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">06 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 7: 安装 — 本地 ===== -->
+            <section class="slide slide-7">
+                <div class="geo-shape geo-orange"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 03</div>
+                    <div class="slide-title reveal">本地安装</div>
+                    <div class="install-wrap">
+                        <div class="install-card reveal">
+                            <div class="install-label">Step 1</div>
+                            <div class="install-title">下载 Hermes</div>
+                            <div class="install-step">
+                                <div class="install-step-num">1</div>
+                                <div class="install-step-text">克隆仓库 <span class="install-code">git clone https://github.com/nousresearch/hermes-agent.git</span></div>
+                            </div>
+                            <div class="install-step">
+                                <div class="install-step-num">2</div>
+                                <div class="install-step-text">安装依赖 <span class="install-code">pip install -e .</span></div>
+                            </div>
+                            <div class="install-step">
+                                <div class="install-step-num">3</div>
+                                <div class="install-step-text">配置 API Key <span class="install-code">hermes config set</span></div>
+                            </div>
+                        </div>
+                        <div class="install-card reveal">
+                            <div class="install-label">Step 2</div>
+                            <div class="install-title">下载 Hermes WebUI</div>
+                            <div class="install-step">
+                                <div class="install-step-num">1</div>
+                                <div class="install-step-text">克隆 WebUI 仓库</div>
+                            </div>
+                            <div class="install-step">
+                                <div class="install-step-num">2</div>
+                                <div class="install-step-text">启动服务 <span class="install-code">hermes webui</span></div>
+                            </div>
+                            <div class="install-step">
+                                <div class="install-step-num">3</div>
+                                <div class="install-step-text">浏览器访问 <span class="install-code">localhost:8080</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">07 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 8: 安装 — 云端 ===== -->
+            <section class="slide slide-8">
+                <div class="geo-shape geo-teal"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 03</div>
+                    <div class="slide-title reveal">云端部署</div>
+                    <div class="cloud-grid">
+                        <div class="cloud-card reveal">
+                            <div class="cloud-icon">🖥️</div>
+                            <div class="cloud-title">阿里云服务器</div>
+                            <div class="cloud-desc">推荐 2C4G 起步<br>Ubuntu 22.04 LTS<br>开放 8080 端口</div>
+                        </div>
+                        <div class="cloud-card reveal">
+                            <div class="cloud-icon">🐳</div>
+                            <div class="cloud-title">宝塔面板 Docker</div>
+                            <div class="cloud-desc">一键安装 Docker<br>可视化容器管理<br>自动 SSL 证书</div>
+                        </div>
+                        <div class="cloud-card reveal">
+                            <div class="cloud-icon">🚀</div>
+                            <div class="cloud-title">安装 Hermes</div>
+                            <div class="cloud-desc">Docker Compose 一键启动<br>持久化数据卷<br>自动重启策略</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">08 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 9: 最佳实践 — Reddit ===== -->
+            <section class="slide slide-9">
+                <div class="geo-shape geo-pink"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 04</div>
+                    <div class="slide-title reveal">Reddit 舆情分析</div>
+                    <div class="practice-wrap">
+                        <div class="practice-left reveal">
+                            <div class="practice-label">工作流</div>
+                            <div class="practice-title">指定版块 + 关键词 + 内容汇总</div>
+                            <div class="practice-desc">通过 reddit-community-research 技能，自动抓取目标 subreddit 的帖子与评论，提取用户痛点、情绪信号与高频关键词。</div>
+                            <div class="practice-flow">
+                                <div class="flow-step">指定版块</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">关键词过滤</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">情感分析</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">汇总报告</div>
+                            </div>
+                        </div>
+                        <div class="practice-right reveal">
+                            <div class="practice-label">工具</div>
+                            <div class="practice-title">reddit-community-research</div>
+                            <div class="practice-desc">系统性爬取 Reddit 社区数据并进行观点整合分析。覆盖 subreddit 数据获取、用户痛点提取、情绪信号识别。</div>
+                            <div class="practice-tool">Skill: reddit-community-research</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">09 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 10: 最佳实践 — PRD 撰写 ===== -->
+            <section class="slide slide-10">
+                <div class="geo-shape geo-green"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 04</div>
+                    <div class="slide-title reveal">PRD 撰写</div>
+                    <div class="practice-wrap">
+                        <div class="practice-left reveal">
+                            <div class="practice-label">工作流</div>
+                            <div class="practice-title">功能拆解 → 交叉评审 → 整合输出</div>
+                            <div class="practice-desc">通过 prd-writing 技能，将产品想法拆解为功能模块，多轮交叉评审确保逻辑闭环，最终输出完整 PRD 并附带 UI Demo 设计。</div>
+                            <div class="practice-flow">
+                                <div class="flow-step">功能拆解</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">交叉评审</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">整合输出</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">UI Demo</div>
+                            </div>
+                        </div>
+                        <div class="practice-right reveal">
+                            <div class="practice-label">工具</div>
+                            <div class="practice-title">prd-writing + frontend-slides</div>
+                            <div class="practice-desc">prd-writing 负责结构化文档输出，frontend-slides 将 PRD 转化为可交互 HTML 原型，实现「文档即 Demo」。</div>
+                            <div class="practice-tool">Skill: prd-writing</div>
+                            <div class="practice-tool" style="margin-top:8px;">Skill: frontend-slides</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">10 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 11: 最佳实践 — Copy Review ===== -->
+            <section class="slide slide-11">
+                <div class="geo-shape geo-orange"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 04</div>
+                    <div class="slide-title reveal">页面文案 Review</div>
+                    <div class="practice-wrap">
+                        <div class="practice-left reveal">
+                            <div class="practice-label">工作流</div>
+                            <div class="practice-title">基于人设和应用场景的 Copy Review</div>
+                            <div class="practice-desc">通过 copy-review 技能，基于产品人设（如 Maygrove 的 Mavi）和应用场景，对页面文案进行逐行评审，输出优化建议。</div>
+                            <div class="practice-flow">
+                                <div class="flow-step">定义人设</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">场景分析</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">逐行 Review</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">优化建议</div>
+                            </div>
+                        </div>
+                        <div class="practice-right reveal">
+                            <div class="practice-label">工具</div>
+                            <div class="practice-title">创建 Skill + Darwin 自进化</div>
+                            <div class="practice-desc">先创建专属 copy-review 技能，再通过 darwin-skill 持续优化评审标准，让 AI 越来越懂你的品牌调性。</div>
+                            <div class="practice-tool">Skill: copy-review</div>
+                            <div class="practice-tool" style="margin-top:8px;">Skill: darwin-skill</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">11 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 12: 最佳实践 — 每日复盘 ===== -->
+            <section class="slide slide-12">
+                <div class="geo-shape geo-yellow"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 04</div>
+                    <div class="slide-title reveal">每日复盘</div>
+                    <div class="review-grid">
+                        <div class="review-card reveal">
+                            <div class="review-icon">📥</div>
+                            <div class="review-title">数据汇总</div>
+                            <div class="review-desc">自动拉取当日任务、会议记录、代码提交</div>
+                        </div>
+                        <div class="review-card reveal">
+                            <div class="review-icon">🔍</div>
+                            <div class="review-title">关键提取</div>
+                            <div class="review-desc">识别当日关键决策、 blocker 与突破点</div>
+                        </div>
+                        <div class="review-card reveal">
+                            <div class="review-icon">📊</div>
+                            <div class="review-title">情绪追踪</div>
+                            <div class="review-desc">记录工作状态与心流时段分布</div>
+                        </div>
+                        <div class="review-card reveal">
+                            <div class="review-icon">🎯</div>
+                            <div class="review-title">明日建议</div>
+                            <div class="review-desc">生成优先级建议与待办事项</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">12 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 13: 技能进化 ===== -->
+            <section class="slide slide-13">
+                <div class="geo-shape geo-violet"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 04</div>
+                    <div class="slide-title reveal">技能的进化</div>
+                    <div class="darwin-wrap">
+                        <div class="darwin-left reveal">
+                            <div class="practice-label">工具</div>
+                            <div class="practice-title">Darwin Skill 2.0</div>
+                            <div class="darwin-desc">Darwin 是 Hermes 的自主技能优化器。它会自动评估你的 Skill 文件，识别薄弱点，提出改进方案，并生成优化后的新版本。</div>
+                            <div class="practice-tool" style="margin-top:20px;">Skill: darwin-skill</div>
+                        </div>
+                        <div class="darwin-right reveal">
+                            <div class="darwin-visual">
+                                <div class="darwin-visual-text">进化飞轮</div>
+                            </div>
+                            <div class="practice-flow" style="margin-top:24px; justify-content:center;">
+                                <div class="flow-step">使用 Skill</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">Darwin 评估</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">自动优化</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">更强 Skill</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">13 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 14: 其它技巧 ===== -->
+            <section class="slide slide-14">
+                <div class="geo-shape geo-teal"></div>
+                <div class="content">
+                    <div class="eyebrow reveal">PART 05</div>
+                    <div class="slide-title reveal">其它技巧</div>
+                    <div class="tips-grid">
+                        <div class="tips-card reveal">
+                            <div class="tips-icon">💬</div>
+                            <div class="tips-title">苏格拉底式反问</div>
+                            <div class="tips-desc">在纯 Chat 场景下，不要直接要答案。用反问引导 AI 帮你梳理思路，例如「你觉得这个方案最大的风险是什么？」</div>
+                        </div>
+                        <div class="tips-card reveal">
+                            <div class="tips-icon">👥</div>
+                            <div class="tips-title">让大佬成为你的智囊团</div>
+                            <div class="tips-desc">通过女娲造人项目，创建多个专家人格（产品经理、设计师、工程师），让它们在群里辩论，你旁听决策。</div>
+                            <a class="tips-link" href="https://github.com/alchaincyf/nuwa-skill" target="_blank">github.com/alchaincyf/nuwa-skill</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-num">14 / 15</div>
+            </section>
+
+            <!-- ===== SLIDE 15: CLOSING ===== -->
+            <section class="slide slide-15">
+                <div class="geo-shape geo-green"></div>
+                <div class="geo-shape geo-pink"></div>
+                <div class="geo-shape geo-orange"></div>
+                <div class="geo-shape geo-yellow"></div>
+                <div class="content">
+                    <div class="slide-title reveal">开始构建你的<br>AI 工作流</div>
+                    <div class="slide-subtitle reveal">Hermes Agent 不只是工具，是你的第二大脑</div>
+                    <div class="cta-box reveal">立即安装 →</div>
+                </div>
+                <div class="meta reveal">Steven · 2026</div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Edit Mode -->
+    <div class="edit-hotzone" id="editHotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.stage = document.getElementById('deckStage');
+                this.setupStageScale();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupWheelNav();
+                this.setupEditMode();
+                this.showSlide(0);
+            }
+
+            setupStageScale() {
+                const scale = () => {
+                    const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                    const x = (window.innerWidth - 1920 * factor) / 2;
+                    const y = (window.innerHeight - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                window.addEventListener('resize', scale);
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.getAttribute('contenteditable')) return;
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        this.showSlide(0);
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        this.showSlide(this.slides.length - 1);
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let startX = 0;
+                let startY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+                document.addEventListener('touchend', (e) => {
+                    const dx = e.changedTouches[0].clientX - startX;
+                    const dy = e.changedTouches[0].clientY - startY;
+                    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+                        if (dx < 0) this.nextSlide();
+                        else this.prevSlide();
+                    }
+                }, { passive: true });
+            }
+
+            setupWheelNav() {
+                let wheelTimeout = null;
+                document.addEventListener('wheel', (e) => {
+                    if (wheelTimeout) return;
+                    wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 600);
+                    if (e.deltaY > 0) this.nextSlide();
+                    else this.prevSlide();
+                }, { passive: true });
+            }
+
+            showSlide(index) {
+                this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+                this.slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === this.currentSlide);
+                    slide.classList.toggle('visible', i === this.currentSlide);
+                });
+            }
+
+            nextSlide() { this.showSlide(this.currentSlide + 1); }
+            prevSlide() { this.showSlide(this.currentSlide - 1); }
+
+            setupEditMode() {
+                const hotzone = document.getElementById('editHotzone');
+                const toggle = document.getElementById('editToggle');
+                let hideTimeout = null;
+                let isEditing = false;
+
+                const showToggle = () => { clearTimeout(hideTimeout); toggle.classList.add('show'); };
+                const hideToggle = () => {
+                    hideTimeout = setTimeout(() => { if (!isEditing) toggle.classList.remove('show'); }, 400);
+                };
+
+                hotzone.addEventListener('mouseenter', showToggle);
+                hotzone.addEventListener('mouseleave', hideToggle);
+                toggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+                toggle.addEventListener('mouseleave', hideToggle);
+                hotzone.addEventListener('click', () => this.toggleEditMode());
+                toggle.addEventListener('click', () => this.toggleEditMode());
+
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                        this.toggleEditMode();
+                    }
+                });
+            }
+
+            toggleEditMode() {
+                const toggle = document.getElementById('editToggle');
+                const isEditing = toggle.classList.contains('active');
+                document.querySelectorAll('.slide [class*="title"], .slide [class*="desc"], .slide [class*="text"], .slide .eyebrow, .slide .meta').forEach(el => {
+                    el.setAttribute('contenteditable', !isEditing);
+                });
+                toggle.classList.toggle('active');
+                toggle.textContent = isEditing ? '✏️' : '💾';
+            }
+        }
+
+        new SlidePresentation();
+    </script>
+</body>
+</html>
