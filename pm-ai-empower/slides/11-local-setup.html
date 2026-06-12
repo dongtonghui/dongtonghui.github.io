@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>本地安装 · AI赋能产品经理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+
+.slide {
+  width: 1920px; height: 1080px; position: relative;
+  background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  overflow: hidden;
+}
+.grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.term-dot:nth-child(1) { background: #FF5F56; }
+.term-dot:nth-child(2) { background: #FFBD2E; }
+.term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+.page-header { margin-bottom: 24px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; margin-bottom: 16px; }
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+.install-panels {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  align-items: stretch;
+  margin-top: 4px;
+}
+.install-panel {
+  background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(0,255,133,0.02));
+  border: 1px solid rgba(0,255,133,0.10);
+  border-radius: 10px;
+  padding: 24px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.install-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(0,255,133,0.3), transparent);
+}
+.install-panel.left {
+  flex: 1.4;
+}
+.install-panel.right {
+  flex: 1;
+}
+.install-panel-header {
+  font-size: 20px;
+  font-weight: 700;
+  color: #E8EDF5;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.install-panel-header .icon { font-size: 28px; }
+
+.term-block {
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(0,255,133,0.10);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #00FF85;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  white-space: pre;
+}
+.term-block .prompt { color: rgba(0,255,133,0.4); }
+.term-block .comment { color: rgba(255,255,255,0.2); }
+
+.checklist {
+  list-style: none;
+  padding: 0;
+}
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 14px;
+  color: rgba(232,237,245,0.5);
+  font-weight: 300;
+}
+.checklist li .check {
+  color: #00FF85;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">pm-terminal — AI赋能产品经理</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">
+      ~/ai-pm/ch03 <span>❯</span> <span class="active">local-install</span>
+    </div>
+
+    <div class="page-header">
+      <div class="page-num">CHAPTER 03 · 本地部署</div>
+      <div class="page-title">本地 <span class="accent">安装</span></div>
+      <div class="page-desc">5分钟，从0到1拥有你的AI Agent</div>
+    </div>
+
+    <div class="install-panels">
+      <!-- Left panel: CLI -->
+      <div class="install-panel left">
+        <div class="install-panel-header">
+          <span class="icon">🖥️</span> CLI终端安装
+        </div>
+        <div class="term-block"><span class="prompt">$</span> curl -fsSL https://raw.githubusercontent.com/<br/>  NousResearch/hermes-agent/main/<br/>  scripts/install.sh | bash<br/><span class="prompt">$</span> hermes setup<br/><span class="prompt">$</span> hermes</div>
+        <ul class="checklist">
+          <li><span class="check">✓</span> 一行命令安装</li>
+          <li><span class="check">✓</span> 终端交互式对话</li>
+          <li><span class="check">✓</span> 纯键盘操作</li>
+        </ul>
+      </div>
+
+      <!-- Right panel: WebUI -->
+      <div class="install-panel right">
+        <div class="install-panel-header">
+          <span class="icon">🌐</span> WebUI安装
+        </div>
+        <div class="term-block"><span class="prompt">$</span> pip install hermes-webui<br/><span class="prompt">$</span> hermes-webui<br/><span class="comment"># 浏览器打开 localhost:...</span></div>
+        <ul class="checklist">
+          <li><span class="check">✓</span> 图形化界面</li>
+          <li><span class="check">✓</span> 文件管理</li>
+          <li><span class="check">✓</span> 适合日常使用</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-indicator">11</div>
+
+  <div class="bottom-line">
+    ~/ai-pm $ install --local<span class="cursor"></span>
+  </div>
+</div>
+</body>
+</html>

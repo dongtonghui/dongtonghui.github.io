@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>选择技能的依据 · AI赋能产品经理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+
+.slide {
+  width: 1920px; height: 1080px; position: relative;
+  background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  overflow: hidden;
+}
+.grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.term-dot:nth-child(1) { background: #FF5F56; }
+.term-dot:nth-child(2) { background: #FFBD2E; }
+.term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+.page-header { margin-bottom: 24px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; margin-bottom: 16px; }
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+.split-panels {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  align-items: stretch;
+  margin-top: 4px;
+}
+.panel-left {
+  flex: 1.4;
+  background: linear-gradient(160deg, rgba(0,255,133,0.04), rgba(0,255,133,0.01));
+  border: 1px solid rgba(0,255,133,0.18);
+  border-radius: 10px;
+  padding: 24px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.panel-left::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(0,255,133,0.5), transparent);
+}
+.panel-right {
+  flex: 1;
+  background: linear-gradient(160deg, rgba(68,187,255,0.04), rgba(68,187,255,0.01));
+  border: 1px solid rgba(68,187,255,0.15);
+  border-radius: 10px;
+  padding: 24px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.panel-right::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(68,187,255,0.5), transparent);
+}
+.panel-header {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.panel-header .icon { font-size: 28px; }
+.panel-left .panel-header { color: #E8EDF5; }
+.panel-right .panel-header { color: #E8EDF5; }
+.skill-list {
+  list-style: none;
+  padding: 0;
+  flex: 1;
+}
+.skill-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.skill-item:last-child {
+  border-bottom: none;
+}
+.skill-item .bullet {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+.panel-left .skill-item .bullet { background: #00FF85; }
+.panel-right .skill-item .bullet { background: #44BBFF; }
+.skill-item .name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: rgba(232,237,245,0.7);
+  line-height: 1.5;
+}
+.skill-item .name .desc {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: rgba(232,237,245,0.35);
+  font-weight: 300;
+  margin-left: 8px;
+}
+.skill-item .name .note {
+  display: block;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  color: rgba(68,187,255,0.35);
+  font-weight: 300;
+  margin-top: 2px;
+  margin-left: 0;
+}
+
+.panel-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(0,255,133,0.35);
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">pm-terminal — AI赋能产品经理</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">
+      ~/ai-pm/ch02 <span>❯</span> <span class="active">skill-selection</span>
+    </div>
+
+    <div class="page-header">
+      <div class="page-num">CHAPTER 02 · 技能选择</div>
+      <div class="page-title">选择技能的 <span class="accent">依据</span></div>
+      <div class="page-desc">能直接干活的 &gt; 能帮你优化技能的</div>
+    </div>
+
+    <div class="split-panels">
+      <!-- Left panel: productive skills -->
+      <div class="panel-left">
+        <div class="panel-header">
+          <span class="icon">🎯</span> 能直接干活的技能
+        </div>
+        <ul class="skill-list">
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">reddit-community-research <span class="desc">舆情分析</span></span>
+          </li>
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">prd-writing <span class="desc">PRD撰写</span></span>
+          </li>
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">huashu-design <span class="desc">UI Demo设计</span></span>
+          </li>
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">copy-review <span class="desc">文案Review</span></span>
+          </li>
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">github-issues/issues-pr <span class="desc">项目管理</span></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right panel: meta skills -->
+      <div class="panel-right">
+        <div class="panel-header">
+          <span class="icon">🔧</span> 能帮你优化技能的技能
+        </div>
+        <ul class="skill-list">
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">darwin-skill <span class="note">自我进化，基于使用日志自动优化</span></span>
+          </li>
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">writing-plans <span class="note">写执行计划</span></span>
+          </li>
+          <li class="skill-item">
+            <span class="bullet"></span>
+            <span class="name">kanban-orchestrator <span class="note">任务分解编排</span></span>
+          </li>
+        </ul>
+        <div class="panel-footer">
+          ❝ 达尔文技能 = 你的AI技能健身教练 ❞
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-indicator">08</div>
+
+  <div class="bottom-line">
+    ~/ai-pm $ skill scan --category "productive"<span class="cursor"></span>
+  </div>
+</div>
+</body>
+</html>

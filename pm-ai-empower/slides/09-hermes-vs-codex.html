@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Hermes vs Codex · AI赋能PM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  
+  .slide {
+    width: 1920px; height: 1080px; position: relative;
+    background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  .grid-overlay {
+    position: absolute; inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .glow-tl {
+    position: absolute; top: -250px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .glow-br {
+    position: absolute; bottom: -200px; right: -150px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Terminal bar */
+  .term-bar {
+    position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3;
+    background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12);
+    display: flex; align-items: center; padding: 0 16px;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+  .term-dot:nth-child(1) { background: #FF5F56; }
+  .term-dot:nth-child(2) { background: #FFBD2E; }
+  .term-dot:nth-child(3) { background: #27C93F; }
+  .term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+
+  /* Content area */
+  .content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px;
+  }
+  .breadcrumb .active { color: rgba(0,255,133,0.5); }
+  .breadcrumb span { margin: 0 6px; }
+
+  /* Page header */
+  .page-header { margin-bottom: 28px; }
+  .page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+  .page-title {
+    font-size: 32px; font-weight: 700; color: #E8EDF5;
+    letter-spacing: -0.3px; margin-bottom: 4px;
+  }
+  .page-title .accent { color: #00FF85; }
+  .page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; }
+
+  /* One-liner highlight box */
+  .oneliner-box {
+    background: linear-gradient(135deg, rgba(0,255,133,0.06), rgba(68,187,255,0.04));
+    border: 1px solid rgba(0,255,133,0.15);
+    border-radius: 8px; padding: 14px 20px; margin-bottom: 24px;
+  }
+  .oneliner-box .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: #00FF85; letter-spacing: 1px; margin-bottom: 4px;
+  }
+  .oneliner-box .quote {
+    font-size: 16px; color: #E8EDF5; line-height: 1.6; font-weight: 400;
+  }
+  .oneliner-box .quote em {
+    font-style: normal; color: #44BBFF;
+  }
+
+  /* Comparison table */
+  .comp-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    font-size: 14px; flex: 1;
+  }
+  .comp-table thead th {
+    text-align: left; padding: 12px 16px;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(0,255,133,0.15);
+  }
+  .comp-table thead th:first-child {
+    color: rgba(232,237,245,0.4); width: 22%;
+  }
+  .comp-table thead th:nth-child(2) {
+    color: #44BBFF; width: 34%;
+  }
+  .comp-table thead th:nth-child(3) {
+    color: #00FF85; width: 44%;
+  }
+
+  .comp-table tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top; line-height: 1.5;
+    color: rgba(232,237,245,0.7);
+  }
+  .comp-table tbody td:first-child {
+    font-weight: 500; color: rgba(232,237,245,0.5);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  }
+  .comp-table tbody td:nth-child(2) { color: rgba(232,237,245,0.55); }
+  .comp-table tbody td:nth-child(3) { color: #E8EDF5; }
+  .comp-table tbody tr:last-child td { border-bottom: none; }
+
+  /* Badge in table */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 3px;
+    font-size: 11px; font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-green { background: rgba(0,255,133,0.12); color: #00FF85; }
+  .badge-blue { background: rgba(68,187,255,0.12); color: #44BBFF; }
+  .badge-amber { background: rgba(255,184,77,0.12); color: #FFB84D; }
+
+  /* Footer */
+  .ref-link {
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: rgba(255,255,255,0.15);
+    border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px;
+  }
+
+  .bottom-line {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3;
+    background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08);
+    display: flex; align-items: center; padding: 0 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15);
+  }
+  .bottom-line .cursor {
+    display: inline-block; width: 7px; height: 14px;
+    background: rgba(0,255,133,0.5); margin-left: 6px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Page indicator */
+  .page-indicator { 
+    position: absolute; bottom: 40px; right: 40px; z-index: 2;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: rgba(255,255,255,0.1); letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">AI×PM — bash — 80×24</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">~/ai-pm/ch02 <span>❯</span> <span class="active">tool-selection</span></div>
+
+    <div class="page-header">
+      <div class="page-num">CHAPTER 02 · 工具选型</div>
+      <div class="page-title">Hermes <span class="accent">vs</span> Codex：如何选择？</div>
+      <div class="page-desc">开源全能管家 vs 专业码农，看场景选工具</div>
+    </div>
+
+    <div class="oneliner-box">
+      <div class="label"># 一句话总结</div>
+      <div class="quote">
+        Codex = OpenAI 做的「<em>专业码农</em>」，只写代码，只跑终端，只认 OpenAI 模型。<br>
+        Hermes = 开源的「<em>全能管家</em>」，不限模型、不限平台、不限场景，能学能记能进化。
+      </div>
+    </div>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>对比维度</th>
+          <th>🔵 Codex</th>
+          <th>🟢 Hermes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>模型支持</td>
+          <td><span class="badge badge-blue">仅 OpenAI</span></td>
+          <td><span class="badge badge-green">20+ 供应商</span> OpenAI / Anthropic / DeepSeek / 本地模型...</td>
+        </tr>
+        <tr>
+          <td>场景边界</td>
+          <td>代码 + 终端命令</td>
+          <td>代码 / 运维 / 研究 / 内容创作 / 自动化 / 舆情...</td>
+        </tr>
+        <tr>
+          <td>消息渠道</td>
+          <td><span class="badge badge-amber">仅终端</span></td>
+          <td>终端 + WebUI + 钉钉 + 飞书 + Telegram + Discord + 微信...</td>
+        </tr>
+        <tr>
+          <td>自我进化</td>
+          <td>无</td>
+          <td><span class="badge badge-green">Skill 系统</span> + 持久记忆 + Darwin 自进化</td>
+        </tr>
+        <tr>
+          <td>多端在线</td>
+          <td>本地终端</td>
+          <td>云端 7×24h 服务器 / Docker / 无服务器（Modal）</td>
+        </tr>
+        <tr>
+          <td>开源</td>
+          <td>❌</td>
+          <td>✅ 完全开源 (MIT)</td>
+        </tr>
+        <tr>
+          <td>价格</td>
+          <td>$20/月 (Copilot 订阅)</td>
+          <td><span class="badge badge-green">免费</span> 自带便宜模型即可运行</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="ref-link">参考：x.com/NousResearch/status/2064189198110699548</div>
+  </div>
+
+  <div class="page-indicator">02.04</div>
+  <div class="bottom-line"><span>~/ai-pm $ select --tool hermes --reason "open+capable"</span><span class="cursor"></span></div>
+</div>
+</body>
+</html>

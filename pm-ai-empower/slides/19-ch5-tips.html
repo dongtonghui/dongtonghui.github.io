@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>更多技巧 · AI PM Empower</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+.slide { width: 1920px; height: 1080px; position: relative; background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%); font-family: 'Noto Sans SC', -apple-system, sans-serif; overflow: hidden; }
+.grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; } .term-dot:nth-child(1) { background: #FF5F56; } .term-dot:nth-child(2) { background: #FFBD2E; } .term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+.page-header { margin-bottom: 28px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; }
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+/* Slide-specific */
+.card-stack { display: flex; flex-direction: column; gap: 10px; flex: 1; padding-top: 4px; }
+.tip-card { border-radius: 8px; padding: 14px 20px; display: flex; flex-direction: column; flex: 1; }
+.tip-card:nth-child(1) { background: rgba(0,255,133,0.04); border: 1px solid rgba(0,255,133,0.2); }
+.tip-card:nth-child(2) { background: rgba(68,187,255,0.04); border: 1px solid rgba(68,187,255,0.2); }
+.tip-card:nth-child(3) { background: rgba(255,189,46,0.04); border: 1px solid rgba(255,189,46,0.2); }
+.tip-card .tip-title { font-size: 16px; font-weight: 600; color: #E8EDF5; margin-bottom: 6px; }
+.tip-card:nth-child(1) .tip-title { color: #00FF85; }
+.tip-card:nth-child(2) .tip-title { color: #44BBFF; }
+.tip-card:nth-child(3) .tip-title { color: #FFBD2E; }
+.tip-card .tip-body { display: flex; gap: 16px; flex: 1; }
+.tip-card .tip-desc { font-size: 13px; color: rgba(232,237,245,0.6); line-height: 1.7; flex: 1; }
+.tip-card .tip-code { flex: 1; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a8e6c8; line-height: 1.7; }
+.tip-card .tip-code.amber { border-color: rgba(255,189,46,0.2); }
+.tip-card .tip-code .prompt { color: rgba(232,237,245,0.4); }
+.tip-card .tip-link { font-size: 12px; color: rgba(68,187,255,0.6); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">zsh — ~/ai-pm/ch05 — 130×36</div>
+  </div>
+  <div class="content">
+    <div class="breadcrumb">~/ai-pm/ch05 <span>❯</span> <span class="active">tips</span></div>
+    <div class="page-header">
+      <div class="page-num">CHAPTER 05</div>
+      <div class="page-title">更多 <span class="accent">技巧</span></div>
+      <div class="page-desc">让AI Agent发挥最大效能的进阶心法</div>
+    </div>
+    <div class="card-stack">
+      <div class="tip-card">
+        <div class="tip-title">💬 善用苏格拉底式反问</div>
+        <div class="tip-body">
+          <div class="tip-desc">纯Chat场景下，不要直接问AI答案。<br>通过反问链让AI帮你理清问题本质。<br>→ "你觉得这个需求完整吗？"</div>
+          <div class="tip-code"></div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">🧬 让大佬成为你的智囊团 — Nuwa-Skill</div>
+        <div class="tip-body">
+          <div class="tip-desc">女娲造人物联网：让AI模拟行业专家视角，一键生成多个专家观点</div>
+          <div class="tip-code">
+            <span class="prompt">$ git clone</span> https://github.com/alchaincyf/nuwa-skill<br>
+            <span class="prompt">$ hermes skills install</span> nuwa-skill<br>
+            <span class="prompt"># → 召唤专家团</span>
+          </div>
+        </div>
+        <div class="tip-link">🔗 https://github.com/alchaincyf/nuwa-skill</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">📦 将工作流沉淀为技能</div>
+        <div class="tip-body">
+          <div class="tip-desc">做过的复杂任务不要重复做。<br>提醒AI将工作流程保存为skill。<br>下次遇到类似任务直接复用</div>
+          <div class="tip-code amber">
+            <span class="prompt">$ skill_manage create \</span><br>
+            &nbsp;&nbsp;--name my-workflow \<br>
+            &nbsp;&nbsp;--template last-session<br>
+            <span class="prompt"># 一键复用</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-indicator">19</div>
+  <div class="bottom-line">~/ai-pm $ tips --all <span class="cursor"></span></div>
+</div>
+</body>
+</html>

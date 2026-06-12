@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>Reddit舆情分析 · AI PM Empower</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+.slide { width: 1920px; height: 1080px; position: relative; background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%); font-family: 'Noto Sans SC', -apple-system, sans-serif; overflow: hidden; }
+.grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; } .term-dot:nth-child(1) { background: #FF5F56; } .term-dot:nth-child(2) { background: #FFBD2E; } .term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+.page-header { margin-bottom: 28px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; }
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+/* Slide-specific */
+.badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+.badge-green { background: rgba(0,255,133,0.12); color: #00FF85; border: 1px solid rgba(0,255,133,0.2); }
+.badge-blue { background: rgba(68,187,255,0.12); color: #44BBFF; border: 1px solid rgba(68,187,255,0.2); }
+.badge-amber { background: rgba(255,189,46,0.12); color: #FFBD2E; border: 1px solid rgba(255,189,46,0.2); }
+.cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; flex: 1; }
+.col-card { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; }
+.col-card .col-title { font-size: 17px; font-weight: 600; color: #E8EDF5; margin-bottom: 14px; }
+.col-card .col-sub { font-size: 13px; color: rgba(232,237,245,0.5); margin-bottom: 12px; }
+.col-card ul { list-style: none; padding: 0; flex: 1; }
+.col-card ul li { font-size: 13px; color: rgba(232,237,245,0.65); padding: 5px 0; padding-left: 14px; position: relative; line-height: 1.6; }
+.col-card ul li::before { content: '›'; position: absolute; left: 0; color: rgba(0,255,133,0.4); }
+.code-sm { background: rgba(0,0,0,0.45); border: 1px solid rgba(0,255,133,0.15); border-radius: 6px; padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a8e6c8; line-height: 1.7; margin-top: 8px; }
+.result-box { background: rgba(0,255,133,0.06); border: 1px solid rgba(0,255,133,0.18); border-radius: 8px; padding: 12px 16px; margin-top: 10px; }
+.result-box .result-title { font-size: 13px; font-weight: 600; color: #00FF85; margin-bottom: 6px; }
+.result-box .result-items { display: flex; flex-wrap: wrap; gap: 10px; }
+.result-box .result-items span { font-size: 12px; color: rgba(232,237,245,0.65); font-family: 'JetBrains Mono', monospace; }
+.result-box .result-items span::before { content: '✔ '; color: #00FF85; }
+.quote-box { margin-top: auto; background: rgba(255,255,255,0.04); border-radius: 6px; padding: 10px 14px; border-left: 2px solid rgba(0,255,133,0.3); font-size: 13px; color: rgba(232,237,245,0.55); line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">zsh — ~/ai-pm/ch04 — 130×36</div>
+  </div>
+  <div class="content">
+    <div class="breadcrumb">~/ai-pm/ch04 <span>❯</span> <span class="active">reddit</span></div>
+    <div class="page-header">
+      <div class="page-num">CHAPTER 04 · 实战场景</div>
+      <div class="page-title">📊 Reddit <span class="accent">舆情分析</span></div>
+      <div class="page-desc">指定版块+指定关键词+内容汇总</div>
+    </div>
+    <div class="cols-3">
+      <div class="col-card">
+        <div class="col-title">🛠️ 配置</div>
+        <span class="badge badge-green">Skill: reddit-community-research</span>
+        <div class="col-sub">Commands:</div>
+        <div class="code-sm">
+$ hermes skills install<br>
+&nbsp;&nbsp;reddit-community-research<br>
+$ skill_view(<br>
+&nbsp;&nbsp;name='reddit-community-research'<br>
+)
+        </div>
+      </div>
+      <div class="col-card">
+        <div class="col-title">🎯 使用</div>
+        <ul>
+          <li>指定 subreddit + 关键词</li>
+          <li>→ 自动抓取热帖</li>
+          <li>→ AI 提炼要点</li>
+          <li>→ 输出结构化报告</li>
+        </ul>
+      </div>
+      <div class="col-card">
+        <div class="col-title">✅ 效果</div>
+        <div class="quote-box">"从手动浏览2小时<br>→ AI自动生成5分钟<br>舆情日报"</div>
+        <div class="result-box" style="margin-top: auto;">
+          <div class="result-title">实时追踪</div>
+          <div class="result-items">
+            <span>竞品动态跟踪</span>
+            <span>用户痛点挖掘</span>
+            <span>趋势预警</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-indicator">14</div>
+  <div class="bottom-line">~/ai-pm $ run reddit --watch "competitor" <span class="cursor"></span></div>
+</div>
+</body>
+</html>

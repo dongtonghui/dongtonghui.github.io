@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>选择工具的依据 · AI赋能产品经理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+
+.slide {
+  width: 1920px; height: 1080px; position: relative;
+  background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  overflow: hidden;
+}
+.grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.term-dot:nth-child(1) { background: #FF5F56; }
+.term-dot:nth-child(2) { background: #FFBD2E; }
+.term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+.page-header { margin-bottom: 28px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; margin-bottom: 16px; }
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+.criteria-grid {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  align-items: stretch;
+  margin-top: 8px;
+}
+.criteria-card {
+  flex: 1;
+  background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(0,255,133,0.02));
+  border: 1px solid rgba(0,255,133,0.12);
+  border-radius: 12px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.criteria-card:hover {
+  border-color: rgba(0,255,133,0.3);
+  box-shadow: 0 0 30px rgba(0,255,133,0.05);
+}
+.criteria-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(0,255,133,0.4), transparent);
+}
+.criteria-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: rgba(0,255,133,0.12);
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  line-height: 1;
+}
+.criteria-icon {
+  font-size: 48px;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 0 12px rgba(0,255,133,0.1));
+}
+.criteria-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #E8EDF5;
+  margin-bottom: 10px;
+}
+.criteria-reason {
+  font-size: 14px;
+  color: rgba(232,237,245,0.5);
+  font-weight: 300;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.criteria-quote-box {
+  margin-top: auto;
+  background: rgba(0,255,133,0.04);
+  border-left: 3px solid rgba(0,255,133,0.3);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+}
+.criteria-quote-box .quote-icon {
+  font-size: 11px;
+  color: rgba(0,255,133,0.3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+.criteria-quote-box .quote-text {
+  font-size: 14px;
+  color: rgba(232,237,245,0.6);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.conclusion-box {
+  margin-top: auto;
+  margin-bottom: 4px;
+  text-align: center;
+  padding: 16px 0 0;
+  border-top: 1px solid rgba(0,255,133,0.08);
+}
+.conclusion-box .conclusion-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(0,255,133,0.3);
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+.conclusion-box .conclusion-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 600;
+  color: #00FF85;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">pm-terminal — AI赋能产品经理</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">
+      ~/ai-pm/ch02 <span>❯</span> <span class="active">criteria</span>
+    </div>
+
+    <div class="page-header">
+      <div class="page-num">CHAPTER 02 · 选型标准</div>
+      <div class="page-title">选择工具的<span class="accent">依据</span></div>
+      <div class="page-desc">不是你选工具，而是需求选工具</div>
+    </div>
+
+    <div class="criteria-grid">
+      <!-- Card 1 -->
+      <div class="criteria-card">
+        <div class="criteria-number">01</div>
+        <div class="criteria-icon">🛠️</div>
+        <div class="criteria-name">足够全能</div>
+        <div class="criteria-reason">不局限某个特定模型，技能扩展性强</div>
+        <div class="criteria-quote-box">
+          <div class="quote-icon">❝</div>
+          <div class="quote-text">Agent的未来不是单一能力，而是无限扩展的能力栈</div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="criteria-card">
+        <div class="criteria-number">02</div>
+        <div class="criteria-icon">☁️</div>
+        <div class="criteria-name">多端在线</div>
+        <div class="criteria-reason">云端7×24H，随时随地调取</div>
+        <div class="criteria-quote-box">
+          <div class="quote-icon">❝</div>
+          <div class="quote-text">好的AI Agent应该像你的私人助理，24小时在线</div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="criteria-card">
+        <div class="criteria-number">03</div>
+        <div class="criteria-icon">🔍</div>
+        <div class="criteria-name">避免黑盒</div>
+        <div class="criteria-reason">便宜模型+可控技能 = 更好的效果 + 过程可调</div>
+        <div class="criteria-quote-box">
+          <div class="quote-icon">❝</div>
+          <div class="quote-text">知其然更知其所以然，拒绝输入输出之间不可知的AI黑盒</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conclusion-box">
+      <div class="conclusion-label">结论 · 交集公式</div>
+      <div class="conclusion-formula">Hermes = 全能 ∩ 在线 ∩ 开放</div>
+    </div>
+  </div>
+
+  <div class="page-indicator">05</div>
+
+  <div class="bottom-line">
+    ~/ai-pm $ eval --criteria "capable+online+open"<span class="cursor"></span>
+  </div>
+</div>
+</body>
+</html>

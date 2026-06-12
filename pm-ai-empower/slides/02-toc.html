@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>AI赋能产品经理 · 培训大纲</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+
+.slide {
+  width: 1920px; height: 1080px; position: relative;
+  background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+.grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.term-dot:nth-child(1) { background: #FF5F56; }
+.term-dot:nth-child(2) { background: #FFBD2E; }
+.term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+
+.page-header { margin-bottom: 28px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; }
+
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+/* Chapter card styles */
+.chapter-list { display: flex; flex-direction: column; gap: 12px; flex: 1; justify-content: center; max-width: 1600px; margin: 0 auto; width: 100%; }
+.chapter-card { display: flex; align-items: stretch; background: rgba(0,255,133,0.03); border: 1px solid rgba(0,255,133,0.08); border-radius: 8px; padding: 0; transition: all 0.2s; overflow: hidden; }
+.chapter-card:hover { background: rgba(0,255,133,0.06); border-color: rgba(0,255,133,0.2); }
+.chapter-num { display: flex; align-items: center; justify-content: center; width: 72px; min-height: 100%; background: rgba(0,255,133,0.06); border-right: 1px solid rgba(0,255,133,0.1); font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: rgba(0,255,133,0.5); flex-shrink: 0; }
+.chapter-body { padding: 14px 24px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.chapter-body h3 { font-size: 18px; font-weight: 600; color: #E8EDF5; margin-bottom: 4px; }
+.chapter-body p { font-size: 13px; color: rgba(232,237,245,0.4); font-weight: 300; line-height: 1.5; }
+.chapter-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #00FF85; margin-right: 8px; vertical-align: middle; opacity: 0.4; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">~/ai-pm — contents</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">~/ai-pm ❯ <span class="active">contents</span></div>
+
+    <div class="page-header">
+      <div class="page-num">CONTENTS</div>
+      <div class="page-title">培训<span class="accent">大纲</span></div>
+      <div class="page-desc">5大章节，带你从认知到实战</div>
+    </div>
+
+    <div class="chapter-list">
+      <div class="chapter-card">
+        <div class="chapter-num">01</div>
+        <div class="chapter-body">
+          <h3><span class="chapter-dot"></span>哪些环节需要AI赋能</h3>
+          <p>Reddit舆情分析 / PRD撰写 / Demo生成 / 每日复盘</p>
+        </div>
+      </div>
+      <div class="chapter-card">
+        <div class="chapter-num">02</div>
+        <div class="chapter-body">
+          <h3><span class="chapter-dot"></span>选择怎样的工具</h3>
+          <p>选择依据 / Hermes vs Codex / 技能选择</p>
+        </div>
+      </div>
+      <div class="chapter-card">
+        <div class="chapter-num">03</div>
+        <div class="chapter-body">
+          <h3><span class="chapter-dot"></span>如何安装</h3>
+          <p>本地安装CLI+WebUI / 云端部署</p>
+        </div>
+      </div>
+      <div class="chapter-card">
+        <div class="chapter-num">04</div>
+        <div class="chapter-body">
+          <h3><span class="chapter-dot"></span>最佳实践</h3>
+          <p>4个实战场景 + Darwin技能进化</p>
+        </div>
+      </div>
+      <div class="chapter-card">
+        <div class="chapter-num">05</div>
+        <div class="chapter-body">
+          <h3><span class="chapter-dot"></span>其它技巧</h3>
+          <p>苏格拉底反问 / Nuwa-Skill / 技能沉淀</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-indicator">02</div>
+  <div class="bottom-line">~/ai-pm $ ls chapters/<span class="cursor"></span></div>
+</div>
+</body>
+</html>

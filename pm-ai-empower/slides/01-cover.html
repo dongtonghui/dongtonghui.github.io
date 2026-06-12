@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>封面 · AI赋能产品经理</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  
+  .slide {
+    width: 1920px; height: 1080px; position: relative;
+    background: linear-gradient(165deg, #050810 0%, #0A1228 35%, #0E1A35 65%, #0A1228 100%);
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  /* Grid overlay for terminal vibe */
+  .grid-overlay {
+    position: absolute; inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,133,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,133,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Radial glow */
+  .glow-1 {
+    position: absolute; top: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,255,133,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 1;
+  }
+  .glow-2 {
+    position: absolute; bottom: -300px; left: -100px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(68,187,255,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 1;
+  }
+
+  /* Terminal bar top */
+  .term-bar {
+    position: absolute; top: 0; left: 0; right: 0; height: 32px;
+    background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12);
+    display: flex; align-items: center; padding: 0 16px; z-index: 2;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+  .term-dot:nth-child(1) { background: #FF5F56; }
+  .term-dot:nth-child(2) { background: #FFBD2E; }
+  .term-dot:nth-child(3) { background: #27C93F; }
+  .term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.35); margin-left: 12px; letter-spacing: 0.5px; }
+
+  /* Content */
+  .content { position: relative; z-index: 2; padding: 120px 80px 80px; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+  /* Status bar like in terminal */
+  .status-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; color: rgba(0,255,133,0.5);
+    margin-bottom: 20px; letter-spacing: 1px;
+  }
+  .status-line::before { content: '❯ '; color: #00FF85; }
+  .status-line span { color: #44BBFF; }
+
+  /* Main title */
+  .main-title {
+    font-size: 72px; font-weight: 900; line-height: 1.2;
+    color: #E8EDF5; margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .main-title .highlight {
+    background: linear-gradient(135deg, #00FF85, #44BBFF);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 24px; font-weight: 300;
+    color: rgba(232,237,245,0.5); letter-spacing: 3px;
+    margin-bottom: 48px;
+  }
+
+  /* Divider */
+  .divider {
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg, #00FF85, transparent);
+    margin-bottom: 48px;
+  }
+
+  /* Info bar */
+  .info-bar {
+    display: flex; gap: 48px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; color: rgba(232,237,245,0.4);
+  }
+  .info-bar .tag {
+    display: inline-block; padding: 4px 14px;
+    border: 1px solid rgba(0,255,133,0.25); border-radius: 4px;
+    color: #00FF85; font-size: 12px;
+  }
+
+  /* Bottom terminal line */
+  .bottom-line {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
+    background: rgba(0,0,0,0.4); border-top: 1px solid rgba(0,255,133,0.1);
+    display: flex; align-items: center; padding: 0 24px; z-index: 2;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(255,255,255,0.2);
+  }
+  .bottom-line .cursor {
+    display: inline-block; width: 8px; height: 16px;
+    background: #00FF85; margin-left: 8px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Decorative code lines */
+  .code-decor {
+    position: absolute; right: 60px; bottom: 120px; z-index: 1;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: rgba(255,255,255,0.04); text-align: right; line-height: 1.8;
+    pointer-events: none;
+  }
+  .code-decor .kw { color: rgba(0,255,133,0.06); }
+  .code-decor .str { color: rgba(68,187,255,0.06); }
+  .code-decor .cm { color: rgba(255,184,77,0.04); }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">AI×PM — bash — 80×24</div>
+  </div>
+
+  <div class="content">
+    <div class="status-line">session start: <span>pm-ai-empower</span> · model: best-practice</div>
+    
+    <div class="main-title">
+      产品经理工作流中的<br>
+      <span class="highlight">AI 赋能</span>
+    </div>
+
+    <div class="subtitle">从场景挖掘到工具选型 · 从安装落地到最佳实践</div>
+
+    <div class="divider"></div>
+
+    <div class="info-bar">
+      <span class="tag">内部培训</span>
+      <span>产品团队 · 2026</span>
+    </div>
+  </div>
+
+  <div class="bottom-line">
+    <span>~/ai-pm $</span><span class="cursor"></span>
+  </div>
+
+  <div class="code-decor">
+    <span class="kw">def</span> <span class="str">empower_pm</span>():<br>
+    <span class="cm">  # 用AI重新定义产品经理</span><br>
+    <span class="kw">  return</span> <span class="str">"10x efficiency"</span>
+  </div>
+</div>
+</body>
+</html>

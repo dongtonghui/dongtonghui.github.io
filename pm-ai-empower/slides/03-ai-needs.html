@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>AI赋能产品经理 · 哪些环节需要AI赋能</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+
+.slide {
+  width: 1920px; height: 1080px; position: relative;
+  background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+.grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.term-dot:nth-child(1) { background: #FF5F56; }
+.term-dot:nth-child(2) { background: #FFBD2E; }
+.term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+
+.page-header { margin-bottom: 28px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; }
+
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+/* Feature grid */
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; align-content: center; max-width: 1600px; margin: 0 auto; width: 100%; position: relative; }
+.feature-card { background: rgba(0,255,133,0.03); border: 1px solid rgba(0,255,133,0.08); border-radius: 10px; padding: 28px 30px; transition: all 0.2s; }
+.feature-card:hover { background: rgba(0,255,133,0.06); border-color: rgba(0,255,133,0.2); }
+.feature-icon { font-size: 32px; margin-bottom: 12px; }
+.feature-card h3 { font-size: 18px; font-weight: 600; color: #00FF85; margin-bottom: 8px; }
+.feature-card p { font-size: 14px; color: rgba(232,237,245,0.5); line-height: 1.7; font-weight: 300; }
+
+/* Grid connecting dots = terminal dotted lines */
+.grid-dot-h { position: absolute; top: 50%; left: calc(50% + 60px); width: calc(50% - 120px); height: 0; border-top: 1px dashed rgba(0,255,133,0.12); transform: translateY(-50%); pointer-events: none; }
+.grid-dot-h-left { position: absolute; top: 50%; right: calc(50% + 60px); width: calc(50% - 120px); height: 0; border-top: 1px dashed rgba(0,255,133,0.12); transform: translateY(-50%); pointer-events: none; }
+.grid-dot-v { position: absolute; left: 50%; top: calc(50% + 60px); width: 0; height: calc(50% - 120px); border-left: 1px dashed rgba(0,255,133,0.12); transform: translateX(-50%); pointer-events: none; }
+.grid-dot-v-top { position: absolute; left: 50%; bottom: calc(50% + 60px); width: 0; height: calc(50% - 120px); border-left: 1px dashed rgba(0,255,133,0.12); transform: translateX(-50%); pointer-events: none; }
+
+/* Bottom link section */
+.bottom-section { margin-top: auto; padding-top: 20px; text-align: center; }
+.hermes-link { display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.3); border: 1px solid rgba(0,255,133,0.08); padding: 8px 20px; border-radius: 6px; background: rgba(0,255,133,0.02); }
+.hermes-link .arrow { color: rgba(0,255,133,0.5); font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">~/ai-pm/ch01 — needs</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">~/ai-pm/ch01 ❯ <span class="active">needs</span></div>
+
+    <div class="page-header">
+      <div class="page-num">CHAPTER 01</div>
+      <div class="page-title">哪些环节需要AI<span class="accent">赋能</span></div>
+      <div class="page-desc">用AI重新定义你的工作流</div>
+    </div>
+
+    <div class="feature-grid">
+      <!-- Top-Left -->
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Reddit舆情分析</h3>
+        <p>指定版块+关键词，自动抓取汇总，洞察用户真实反馈</p>
+      </div>
+      <!-- Top-Right -->
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>PRD撰写</h3>
+        <p>功能模块拆解、交叉评审、整合输出、UI Demo设计，一键生成</p>
+      </div>
+      <!-- Bottom-Left -->
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Demo生成</h3>
+        <p>用AI快速生成高保真可交互原型，减少设计返工</p>
+      </div>
+      <!-- Bottom-Right -->
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>每日复盘</h3>
+        <p>自动记录工作轨迹，AI辅助提炼洞察，日日精进</p>
+      </div>
+
+      <!-- Dotted grid connectors -->
+      <div class="grid-dot-h"></div>
+      <div class="grid-dot-h-left"></div>
+      <div class="grid-dot-v"></div>
+      <div class="grid-dot-v-top"></div>
+    </div>
+
+    <div class="bottom-section">
+      <div class="hermes-link">
+        <span class="arrow">❯</span> 为什么选择 Hermes <span style="color:rgba(0,255,133,0.15);">→ 查看下一章</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-indicator">03</div>
+  <div class="bottom-line">~/ai-pm $ scan --workflow<span class="cursor"></span></div>
+</div>
+</body>
+</html>

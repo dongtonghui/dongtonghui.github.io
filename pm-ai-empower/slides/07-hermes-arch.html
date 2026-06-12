@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>Hermes架构 · AI赋能产品经理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+
+.slide {
+  width: 1920px; height: 1080px; position: relative;
+  background: linear-gradient(175deg, #050810 0%, #0A1228 40%, #0E1A35 70%, #0A1228 100%);
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  overflow: hidden;
+}
+.grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,133,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,133,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+.glow-tl { position: absolute; top: -250px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(68,187,255,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-br { position: absolute; bottom: -200px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,255,133,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.term-bar { position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(0,255,133,0.12); display: flex; align-items: center; padding: 0 16px; }
+.term-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.term-dot:nth-child(1) { background: #FF5F56; }
+.term-dot:nth-child(2) { background: #FFBD2E; }
+.term-dot:nth-child(3) { background: #27C93F; }
+.term-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 12px; }
+.content { position: relative; z-index: 2; padding: 56px 72px 32px; height: 100%; display: flex; flex-direction: column; }
+.breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(232,237,245,0.3); margin-bottom: 16px; }
+.breadcrumb .active { color: rgba(0,255,133,0.5); }
+.breadcrumb span { margin: 0 6px; }
+.page-header { margin-bottom: 20px; }
+.page-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(0,255,133,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+.page-title { font-size: 32px; font-weight: 700; color: #E8EDF5; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-title .accent { color: #00FF85; }
+.page-desc { font-size: 15px; color: rgba(232,237,245,0.45); font-weight: 300; margin-bottom: 16px; }
+.bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; z-index: 3; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,255,133,0.08); display: flex; align-items: center; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.15); }
+.bottom-line .cursor { display: inline-block; width: 7px; height: 14px; background: rgba(0,255,133,0.5); margin-left: 6px; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.page-indicator { position: absolute; bottom: 40px; right: 40px; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.1); letter-spacing: 1px; }
+
+/* Architecture Diagram */
+.arch-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* Badges floating around */
+.arch-badge {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(0,255,133,0.08);
+  border: 1px solid rgba(0,255,133,0.15);
+  color: rgba(0,255,133,0.5);
+}
+.arch-badge.b1 { top: 30px; right: 60px; }
+.arch-badge.b2 { top: 330px; right: 40px; }
+.arch-badge.b3 { bottom: 120px; right: 70px; }
+
+/* Layer labels */
+.layer-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Top layer - User Channels */
+.channels-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.channel-box {
+  background: rgba(0,255,133,0.04);
+  border: 1px solid rgba(0,255,133,0.10);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(232,237,245,0.5);
+  transition: border-color 0.3s;
+}
+.channel-box:hover {
+  border-color: rgba(0,255,133,0.25);
+  color: rgba(232,237,245,0.7);
+}
+
+/* Arrows down */
+.arrow-down {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(0,255,133,0.15);
+  line-height: 1;
+  margin: 2px 0;
+}
+
+/* Middle layer - Core */
+.core-box {
+  width: 700px;
+  background: linear-gradient(160deg, rgba(0,255,133,0.06), rgba(68,187,255,0.04));
+  border: 1px solid rgba(0,255,133,0.20);
+  border-radius: 10px;
+  padding: 18px 24px 20px;
+  text-align: center;
+  position: relative;
+}
+.core-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(0,255,133,0.4), transparent);
+}
+.core-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #E8EDF5;
+  margin-bottom: 12px;
+}
+.core-title .accent { color: #00FF85; }
+.core-features {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.core-feature {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(232,237,245,0.45);
+  padding: 4px 12px;
+  background: rgba(0,255,133,0.03);
+  border: 1px solid rgba(0,255,133,0.08);
+  border-radius: 4px;
+}
+
+/* Sub-components row under core */
+.sub-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+.sub-box {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(0,255,133,0.08);
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(232,237,245,0.4);
+}
+.sub-box:hover {
+  border-color: rgba(0,255,133,0.2);
+  color: rgba(232,237,245,0.6);
+}
+.sub-connector {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: rgba(0,255,133,0.1);
+}
+
+/* Bottom layer - Backend */
+.backend-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.backend-box {
+  background: rgba(68,187,255,0.04);
+  border: 1px solid rgba(68,187,255,0.10);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(232,237,245,0.4);
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grid-overlay"></div>
+  <div class="glow-tl"></div>
+  <div class="glow-br"></div>
+
+  <div class="term-bar">
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-dot"></div>
+    <div class="term-title">pm-terminal — AI赋能产品经理</div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">
+      ~/ai-pm/ch02 <span>❯</span> <span class="active">architecture</span>
+    </div>
+
+    <div class="page-header">
+      <div class="page-num">CHAPTER 02 · 架构解读</div>
+      <div class="page-title">Hermes <span class="accent">架构</span>有什么优势</div>
+      <div class="page-desc">开源 + 模块化 + 可插拔 = 真正的全能管家</div>
+    </div>
+
+    <div class="arch-wrapper">
+      <!-- Floating badges -->
+      <div class="arch-badge b1">开源</div>
+      <div class="arch-badge b2">MIT</div>
+      <div class="arch-badge b3">可扩展</div>
+
+      <!-- Layer 1: User channels -->
+      <div class="layer-label">// USER CHANNELS</div>
+      <div class="channels-row">
+        <div class="channel-box">CLI</div>
+        <div class="channel-box">WebUI</div>
+        <div class="channel-box">钉钉</div>
+        <div class="channel-box">飞书</div>
+        <div class="channel-box">Telegram</div>
+        <div class="channel-box">Discord</div>
+        <div class="channel-box">API</div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <!-- Layer 2: Core -->
+      <div class="core-box">
+        <div class="core-title"><span class="accent">AI Agent Core</span> · 智能中枢</div>
+        <div class="core-features">
+          <div class="core-feature">会话管理</div>
+          <div class="core-feature">工具调度</div>
+          <div class="core-feature">上下文压缩</div>
+        </div>
+      </div>
+
+      <div class="arrow-down" style="font-size:11px; color:rgba(0,255,133,0.08); margin:1px 0;">╲ Skills · Memory · Cron · MCP ╱</div>
+
+      <!-- Sub-components -->
+      <div class="sub-row">
+        <div class="sub-box">📦 Skills</div>
+        <div class="sub-connector">◈</div>
+        <div class="sub-box">🧠 Memory</div>
+        <div class="sub-connector">◈</div>
+        <div class="sub-box">⏰ Cron</div>
+        <div class="sub-connector">◈</div>
+        <div class="sub-box">🔗 MCP</div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <!-- Layer 3: Backend -->
+      <div class="layer-label">// BACKEND INFRASTRUCTURE</div>
+      <div class="backend-row">
+        <div class="backend-box">20+ LLM供应商</div>
+        <div class="backend-box">本地模型</div>
+        <div class="backend-box">云端7×24h</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-indicator">07</div>
+
+  <div class="bottom-line">
+    ~/ai-pm $ cat /architecture --visual<span class="cursor"></span>
+  </div>
+</div>
+</body>
+</html>
