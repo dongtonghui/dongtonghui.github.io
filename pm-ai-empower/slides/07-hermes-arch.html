@@ -45,7 +45,7 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   position: relative;
 }
 
@@ -53,12 +53,12 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 .arch-badge {
   position: absolute;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  padding: 4px 12px;
+  font-size: 14px;
+  padding: 6px 16px;
   border-radius: 20px;
-  background: rgba(0,255,133,0.08);
-  border: 1px solid rgba(0,255,133,0.15);
-  color: rgba(0,255,133,0.5);
+  background: rgba(0,255,133,0.10);
+  border: 1px solid rgba(0,255,133,0.20);
+  color: rgba(0,255,133,0.6);
 }
 .arch-badge.b1 { top: 30px; right: 60px; }
 .arch-badge.b2 { top: 330px; right: 40px; }
@@ -67,28 +67,28 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 /* Layer labels */
 .layer-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: rgba(255,255,255,0.2);
-  letter-spacing: 2px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 3px;
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 /* Top layer - User Channels */
 .channels-row {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
 }
 .channel-box {
   background: rgba(0,255,133,0.04);
   border: 1px solid rgba(0,255,133,0.10);
-  border-radius: 6px;
-  padding: 6px 14px;
+  border-radius: 8px;
+  padding: 10px 20px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: rgba(232,237,245,0.5);
+  font-size: 16px;
+  color: rgba(232,237,245,0.55);
   transition: border-color 0.3s;
 }
 .channel-box:hover {
@@ -107,11 +107,11 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 
 /* Middle layer - Core */
 .core-box {
-  width: 700px;
+  width: 800px;
   background: linear-gradient(160deg, rgba(0,255,133,0.06), rgba(68,187,255,0.04));
-  border: 1px solid rgba(0,255,133,0.20);
-  border-radius: 10px;
-  padding: 18px 24px 20px;
+  border: 1px solid rgba(0,255,133,0.22);
+  border-radius: 12px;
+  padding: 22px 28px 24px;
   text-align: center;
   position: relative;
 }
@@ -120,28 +120,28 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(0,255,133,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,255,133,0.5), transparent);
 }
 .core-title {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: #E8EDF5;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .core-title .accent { color: #00FF85; }
 .core-features {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   justify-content: center;
 }
 .core-feature {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: rgba(232,237,245,0.45);
-  padding: 4px 12px;
+  font-size: 16px;
+  color: rgba(232,237,245,0.5);
+  padding: 8px 18px;
   background: rgba(0,255,133,0.03);
   border: 1px solid rgba(0,255,133,0.08);
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 /* Sub-components row under core */
@@ -154,11 +154,11 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 .sub-box {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(0,255,133,0.08);
-  border-radius: 6px;
-  padding: 6px 16px;
+  border-radius: 8px;
+  padding: 10px 22px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: rgba(232,237,245,0.4);
+  font-size: 15px;
+  color: rgba(232,237,245,0.45);
 }
 .sub-box:hover {
   border-color: rgba(0,255,133,0.2);
@@ -166,25 +166,25 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; }
 }
 .sub-connector {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  color: rgba(0,255,133,0.1);
+  font-size: 18px;
+  color: rgba(0,255,133,0.15);
 }
 
 /* Bottom layer - Backend */
 .backend-row {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
 }
 .backend-box {
   background: rgba(68,187,255,0.04);
   border: 1px solid rgba(68,187,255,0.10);
-  border-radius: 6px;
-  padding: 6px 14px;
+  border-radius: 8px;
+  padding: 10px 22px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: rgba(232,237,245,0.4);
+  font-size: 16px;
+  color: rgba(232,237,245,0.45);
 }
 </style>
 </head>
