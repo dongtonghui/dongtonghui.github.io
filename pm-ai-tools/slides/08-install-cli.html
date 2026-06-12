@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 安装 CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .cli-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 16px;
+    }
+
+    .cli-intro {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0 0 8px 0;
+    }
+
+    .cli-intro strong {
+      color: var(--color-text);
+    }
+
+    .cli-steps {
+      display: flex;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .cli-step {
+      flex: 1;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .cli-step:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      transform: translateY(-3px);
+    }
+
+    .cli-step .step-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .cli-step .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--color-primary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cli-step .step-label {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .cli-step .step-arrow {
+      position: absolute;
+      right: -22px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      color: var(--color-primary);
+      opacity: 0.5;
+      z-index: 2;
+    }
+
+    .cli-step .step-desc {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .cli-code-block {
+      background: #1E1E2E;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cli-code-block code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: #A6E3A1;
+      line-height: 1.7;
+      display: block;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .cli-code-block .code-prompt {
+      color: #89B4FA;
+    }
+
+    .cli-code-block .code-comment {
+      color: #6C7086;
+    }
+
+    .cli-extras {
+      display: flex;
+      gap: 24px;
+      margin-top: auto;
+    }
+
+    .cli-extra-card {
+      flex: 1;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .cli-extra-card .extra-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .cli-extra-card .extra-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .cli-extra-card .extra-desc {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .cli-extra-card .extra-cmd {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--color-primary);
+      font-weight: 600;
+      background: var(--color-primary-light);
+      padding: 4px 12px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .platform-tip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      background: var(--color-primary-light);
+      border-radius: 12px;
+      font-size: 15px;
+      color: var(--color-text);
+    }
+
+    .platform-tip .tip-icon {
+      font-size: 22px;
+    }
+
+    .platform-tip .tip-text {
+      font-weight: 500;
+    }
+
+    .platform-tip .os-badges {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .platform-tip .os-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: white;
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">⌨</div>
+      <h1>安装 Hermes · CLI 模式</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="cli-content">
+      <p class="cli-intro">
+        一行命令，即刻上手。<strong>Hermes CLI</strong> 是体验 Hermes 核心能力最快速的方式，支持交互对话与脚本集成。
+      </p>
+
+      <!-- 3-step flow -->
+      <div class="cli-steps">
+        <!-- Step 1 -->
+        <div class="cli-step animate-in animate-in-delay-1">
+          <div class="step-top">
+            <div class="step-num">01</div>
+            <span class="step-label">一键安装</span>
+          </div>
+          <pre class="cli-code-block"><code><span class="code-prompt">$</span> curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</code></pre>
+          <p class="step-desc">自动检测系统环境，安装 Hermes 到本地，无需手动配置依赖。</p>
+          <div class="step-arrow">→</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="cli-step animate-in animate-in-delay-2">
+          <div class="step-top">
+            <div class="step-num">02</div>
+            <span class="step-label">交互对话</span>
+          </div>
+          <pre class="cli-code-block"><code><span class="code-prompt">$</span> hermes</code></pre>
+          <p class="step-desc">启动交互式终端，直接开始对话。Hermes 自动加载工具和技能。</p>
+          <div class="step-arrow">→</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="cli-step animate-in animate-in-delay-3">
+          <div class="step-top">
+            <div class="step-num">03</div>
+            <span class="step-label">单次查询</span>
+          </div>
+          <pre class="cli-code-block"><code><span class="code-prompt">$</span> hermes chat -q "分析这份PRD文档"</code></pre>
+          <p class="step-desc">无需进入交互模式，直接传入问题参数，快速获取回答。</p>
+        </div>
+      </div>
+
+      <!-- Extra features -->
+      <div class="cli-extras">
+        <div class="cli-extra-card animate-in animate-in-delay-3">
+          <div class="extra-icon">🔄</div>
+          <div>
+            <div class="extra-title">切换模型</div>
+            <p class="extra-desc">运行 <span class="extra-cmd">hermes model</span> 实时切换 AI 底层模型</p>
+          </div>
+        </div>
+        <div class="cli-extra-card animate-in animate-in-delay-4">
+          <div class="extra-icon">📋</div>
+          <div>
+            <div class="extra-title">管道集成</div>
+            <p class="extra-desc">支持 <span class="extra-cmd">echo "prompt" | hermes</span> 管道模式</p>
+          </div>
+        </div>
+        <div class="cli-extra-card animate-in animate-in-delay-5">
+          <div class="extra-icon">⚙️</div>
+          <div>
+            <div class="extra-title">技能管理</div>
+            <p class="extra-desc">运行 <span class="extra-cmd">hermes skill</span> 管理已安装的技能</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform tip -->
+      <div class="platform-tip animate-in animate-in-delay-5">
+        <span class="tip-icon">🖥</span>
+        <span class="tip-text">支持平台：</span>
+        <div class="os-badges">
+          <span class="os-badge">🐧 Linux</span>
+          <span class="os-badge">🍎 macOS</span>
+          <span class="os-badge">🪟 WSL2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 安装 CLI</span>
+      <span class="page-number">08</span>
+    </div>
+  </div>
+</body>
+</html>

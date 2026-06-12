@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>开始你的AI赋能之旅 · 封底</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---- Full dark gradient slide ---- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0A0A0A 0%, #1a1a2e 40%, #16213e 70%, #0f3460 100%);
+      color: #FFFFFF;
+      padding: 80px 100px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Subtle grid/pattern overlay */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ---- Header ---- */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 48px;
+      flex-shrink: 0;
+    }
+
+    .page-header .section-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: #2563EB;
+      background: rgba(37, 99, 235, 0.15);
+      padding: 6px 16px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+    }
+
+    .page-header .section-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+    }
+
+    /* ---- Hero / Tagline ---- */
+    .hero-tagline {
+      text-align: center;
+      margin-bottom: 48px;
+      flex-shrink: 0;
+    }
+
+    .hero-tagline h2 {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #93C5FD 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .hero-tagline p {
+      font-size: 18px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ---- Action Cards ---- */
+    .action-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .action-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 20px;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2563EB, #60A5FA);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .action-card:hover {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: rgba(37, 99, 235, 0.4);
+      transform: translateY(-4px);
+    }
+
+    .action-card:hover::before {
+      opacity: 1;
+    }
+
+    .action-card .card-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2563EB;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+    .action-card .card-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
+    .action-card h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    .action-card p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.65);
+      flex: 1;
+    }
+
+    .action-card .action-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #60A5FA;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* ---- Quote block ---- */
+    .quote-section {
+      text-align: center;
+      margin: 32px 0;
+      flex-shrink: 0;
+    }
+
+    .quote-section blockquote {
+      font-size: 22px;
+      font-weight: 500;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.6;
+      position: relative;
+      padding: 0 40px;
+    }
+
+    .quote-section blockquote::before {
+      content: '\201C';
+      font-size: 64px;
+      color: #2563EB;
+      position: absolute;
+      left: -8px;
+      top: -20px;
+      opacity: 0.5;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .quote-section blockquote::after {
+      content: '\201D';
+      font-size: 64px;
+      color: #2563EB;
+      position: absolute;
+      right: -8px;
+      bottom: -40px;
+      opacity: 0.5;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* ---- Footer with speaker info ---- */
+    .page-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .page-footer .thank-you {
+      font-size: 20px;
+      font-weight: 600;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+    }
+
+    .page-footer .speaker-info {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .page-footer .speaker-info span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-footer .speaker-info .qa-badge {
+      display: inline-block;
+      background: rgba(37, 99, 235, 0.2);
+      color: #60A5FA;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      padding: 2px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .page-footer .page-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.3);
+      margin-top: 4px;
+    }
+
+    /* ---- Decorative elements ---- */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb.orb-1 {
+      width: 400px;
+      height: 400px;
+      background: rgba(37, 99, 235, 0.12);
+      top: -100px;
+      right: -100px;
+    }
+
+    .glow-orb.orb-2 {
+      width: 300px;
+      height: 300px;
+      background: rgba(96, 165, 250, 0.08);
+      bottom: -50px;
+      left: -50px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Decorative orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <span class="section-number">17</span>
+      <h1 class="section-title">开始你的 AI 赋能之旅</h1>
+    </div>
+
+    <!-- Hero Tagline -->
+    <div class="hero-tagline">
+      <h2>从今天开始，让 AI 成为你的超级队友</h2>
+      <p>三步开启你的 AI 赋能产品管理工作流</p>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="action-cards">
+      <div class="action-card">
+        <span class="card-number">STEP 01</span>
+        <div class="card-icon">⚡</div>
+        <h3>今天装一个 Hermes 试试</h3>
+        <p>只需一条命令即可开始体验。从 WebUI 或终端，零配置即可感受 AI Agent 的强大能力。</p>
+        <div class="action-hint">npm create hermes</div>
+      </div>
+
+      <div class="action-card">
+        <span class="card-number">STEP 02</span>
+        <div class="card-icon">🎯</div>
+        <h3>选择一个场景开始实践</h3>
+        <p>从需求文档撰写、竞品分析、用户访谈总结到PRD评审——选一个你日常工作的高频场景开始。</p>
+        <div class="action-hint">从小场景开始，快速验证</div>
+      </div>
+
+      <div class="action-card">
+        <span class="card-number">STEP 03</span>
+        <div class="card-icon">🧠</div>
+        <h3>把流程沉淀为 Skill</h3>
+        <p>每次与 AI 协作完成一个任务后，把流程、提示词、最佳实践保存为 Skill。越用越聪明，越用越顺手。</p>
+        <div class="action-hint">你的专属 AI 工作流库</div>
+      </div>
+    </div>
+
+    <!-- Quote -->
+    <div class="quote-section">
+      <blockquote>
+        不要等 AI 变得更好——<br>让它 <span style="color: #60A5FA;">和你一起变好</span>。
+      </blockquote>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <div class="thank-you">感谢聆听 🙌</div>
+      <div class="speaker-info">
+        <span>👤 演讲者：产品经理 · AI 实践者</span>
+        <span>📧 hello@example.com</span>
+        <span class="qa-badge">Q &amp; A</span>
+      </div>
+      <div class="page-num">17 / 17</div>
+    </div>
+  </div>
+</body>
+</html>

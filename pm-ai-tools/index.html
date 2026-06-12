@@ -1,0 +1,367 @@
+1|<!DOCTYPE html>
+2|<html lang="zh-CN">
+3|<head>
+4|<meta charset="UTF-8">
+5|<title>Deck · Multi-file Slide Index</title>
+6|<!--
+7|  deck_index.html — 多文件 slide deck 拼接器 · 双概览模式
+8|
+9|  概览（默认进入，两种模式按 getSeconds()%5 随机：20% 画廊 / 80% 网格）：
+10|   · grid  自适应网格墙：列数随页数+视口自适应，行多则倾斜变平，scale-to-fit 居中铺满（任意页数都不溢出/不失真）
+11|   · gallery 无限画廊：固定卡片大小，无缝无限平铺 + 缓慢漂移 + 轻微呼吸；一个 tile 含全部页（洗牌），看完所有页才重复
+12|  演示 present：单页 fit 缩放翻页。ESC / ⊞ 回概览。
+13|  性能：manifest 每项可带 thumb（预渲染缩略图），概览即用 <img> 平铺，避免 N 个 iframe 同时加载。
+14|
+15|  用法：复制为 index.html；建 slides/ 放每页独立 HTML；编辑 MANIFEST。
+16|  可选覆盖：window.DECK_OVERVIEW = 'grid' | 'gallery'（不写则随机）；URL ?ov=grid|gallery 临时强制。
+17|  键盘（演示）：← / → / Space / PgUp / PgDown / Home / End / 1-9 / P 打印 / ESC 回概览
+18|-->
+19|<script>
+20|    window.DECK_MANIFEST = [
+    { file: "slides/01-cover.html", label: "封面" },
+    { file: "slides/02-agenda.html", label: "目录" },
+    { file: "slides/03-why-ai.html", label: "哪些环节需要AI赋能" },
+    { file: "slides/04-hermes-intro.html", label: "为什么是Hermes" },
+    { file: "slides/05-hermes-arch.html", label: "Hermes架构优势" },
+    { file: "slides/06-hermes-vs-codex.html", label: "Hermes vs Codex" },
+    { file: "slides/07-hermes-vs-codex-2.html", label: "工具 vs 经验" },
+    { file: "slides/08-install-cli.html", label: "安装 · CLI" },
+    { file: "slides/09-install-webui.html", label: "安装 · WebUI" },
+    { file: "slides/10-install-cloud.html", label: "安装 · 云端部署" },
+    { file: "slides/11-practice-reddit.html", label: "Reddit舆情分析" },
+    { file: "slides/12-practice-prd.html", label: "PRD撰写" },
+    { file: "slides/13-practice-review.html", label: "文案Review & 进化" },
+    { file: "slides/14-practice-review-daily.html", label: "每日复盘" },
+    { file: "slides/15-tips.html", label: "其它技巧" },
+    { file: "slides/16-comparison-detail.html", label: "完整对比" },
+    { file: "slides/17-closing.html", label: "封底" },
+  ];
+21|
+22|  ];
+23|  window.DECK_WIDTH = 1920;
+24|  window.DECK_HEIGHT = 1080;
+25|  window.GALLERY_CARD_W = 300;       // 画廊卡片基准宽度
+26|  window.GALLERY_DRIFT_SECONDS = 80; // 画廊漂移一圈时长
+27|  window.DECK_OVERVIEW = 'grid';  // 取消注释可固定概览模式
+28|</script>
+29|
+30|<style>
+31|  * { box-sizing: border-box; margin: 0; padding: 0; }
+32|  html, body { height: 100%; overflow: hidden; font-family: -apple-system, "PingFang SC", sans-serif; background: #0a0a0a; }
+33|
+34|  .overview { position: fixed; inset: 0; }
+35|  body[data-mode="present"] .overview { display: none; }
+36|  body[data-mode="present"] .start-btn { display: none; }
+37|  body[data-mode="overview"] #present-ui { display: none; }
+38|  body[data-ov="grid"]    #ov-gallery { display: none; }
+39|  body[data-ov="gallery"] #ov-grid    { display: none; }
+40|  body[data-ov="gallery"][data-mode="overview"] { background: #0a0805; }
+41|  body[data-ov="grid"][data-mode="overview"]    { background: #efece4; }
+42|
+43|  /* ════════ 模式 1 · 自适应网格墙（一屏装得下→居中轻斜；装不下→舒适大小竖向滚动）════════ */
+44|  #ov-grid { display: flex; justify-content: center; perspective: 2200px; perspective-origin: 50% 42%;
+45|    background: radial-gradient(120% 90% at 50% 0%, #f4f1e9, #e7e3d8 75%); }
+46|  body[data-grid="fit"]    #ov-grid { overflow: hidden;   align-items: center; }
+47|  body[data-grid="scroll"] #ov-grid { overflow-y: auto; overflow-x: hidden; align-items: flex-start; padding: 74px 0 110px; }
+48|  .wall-wrap { }
+49|  body[data-grid="fit"]    .wall-wrap { transform: translateY(-3vh); }
+50|  .wall { display: grid; gap: 20px; transform-origin: center center; margin: 0 auto; }  /* 不用 preserve-3d：整墙作单个倾斜平面，命中测试可靠 */
+51|  #ov-grid .card {
+52|    position: relative; aspect-ratio: 16/9; border-radius: 9px; overflow: hidden; background: #fff; cursor: pointer;
+53|    box-shadow: 0 16px 34px rgba(40,34,24,0.20), 0 3px 10px rgba(40,34,24,0.12);
+54|    transition: transform .28s cubic-bezier(.2,.7,.2,1), box-shadow .28s;
+55|  }
+56|  #ov-grid .card:hover {
+57|    transform: scale(1.18);
+58|    box-shadow: 0 48px 92px rgba(40,34,24,0.36), 0 14px 30px rgba(40,34,24,0.22); z-index: 20;
+59|  }
+60|
+61|  /* ════════ 模式 2 · 无限画廊 ════════ */
+62|  #ov-gallery { overflow: hidden; perspective: 2200px; perspective-origin: 50% 42%;
+63|    background: radial-gradient(130% 120% at 50% 38%, #1b1610, #0a0805 82%); }
+64|  .stage3d { --rx: 18; --rz: 9; position: absolute; inset: 0; transform-style: preserve-3d; transform: scale(1.22) rotateX(18deg) rotateZ(-9deg); transform-origin: center center; }
+65|  .breathe { position: absolute; inset: 0; animation: breathe 26s ease-in-out infinite; transform-origin: center center; transform-style: preserve-3d; }
+66|  .drift-layer { position: absolute; top: 0; left: 0; will-change: transform; animation: drift var(--driftSec, 80s) linear infinite; transform-style: preserve-3d; }
+67|  #ov-gallery:hover .drift-layer { animation-play-state: paused; }
+68|  .gallery { display: grid; }
+69|  #ov-gallery .card {
+70|    position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #fff; cursor: pointer;
+71|    box-shadow: 0 14px 30px rgba(0,0,0,0.42), 0 3px 9px rgba(0,0,0,0.3);
+72|    transition: transform .34s cubic-bezier(.2,.7,.2,1), box-shadow .34s; transform-style: preserve-3d; will-change: transform;
+73|  }
+74|  #ov-gallery .card:hover {
+75|    transform: translateZ(60px) rotateX(calc(var(--rx,18)*-1deg)) rotateZ(calc(var(--rz,9)*1deg)) scale(1.06);
+76|    box-shadow: 0 30px 64px rgba(0,0,0,0.55), 0 8px 20px rgba(0,0,0,0.4); z-index: 30;
+77|  }
+78|  .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 20; box-shadow: inset 0 0 240px 70px rgba(8,6,3,0.62); }
+79|  @keyframes drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--dx)*-1), calc(var(--dy)*-1), 0); } }
+80|  @keyframes breathe { 0%,100% { transform: scale(1.0); } 50% { transform: scale(1.045); } }
+81|
+82|  /* 卡片通用内容 */
+83|  .card .thumb { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; transform-origin: top left; pointer-events: none; }
+84|  .card .thumb iframe { width: 1920px; height: 1080px; border: 0; display: block; background: #fff; pointer-events: none; }
+85|  .card .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+86|  .card .num { position: absolute; bottom: 6px; left: 7px; background: rgba(16,12,7,0.76); color: #fff; font-size: 11px; line-height: 1; padding: 4px 7px; border-radius: 5px; font-variant-numeric: tabular-nums; letter-spacing: 0.03em; z-index: 3; pointer-events: none; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+87|  #ov-gallery .card .num { opacity: 0; transition: opacity .25s; }
+88|  #ov-gallery .card:hover .num { opacity: 1; }
+89|
+90|  .overview-title { position: fixed; top: 24px; left: 0; right: 0; text-align: center; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; z-index: 40; pointer-events: none; }
+91|  body[data-ov="grid"]    .overview-title { color: #5a5346; opacity: 0.66; }
+92|  body[data-ov="gallery"] .overview-title { color: rgba(244,238,224,0.7); text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+93|
+94|  .start-btn { position: fixed; bottom: 26px; right: 26px; border: 0; padding: 13px 24px; border-radius: 999px; font-size: 15px; font-family: inherit; letter-spacing: 0.04em; cursor: pointer; z-index: 200; transition: transform .18s, box-shadow .18s; }
+95|  body[data-ov="grid"]    .start-btn { background: #1a1712; color: #fff; box-shadow: 0 8px 28px rgba(40,34,24,0.28); }
+96|  body[data-ov="gallery"] .start-btn { background: #f4eee0; color: #1a1712; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+97|  .start-btn:hover { transform: translateY(-2px); }
+98|
+99|  /* ════════ 演示模式 ════════ */
+100|  #stage { position: fixed; top: 50%; left: 50%; transform-origin: top left; will-change: transform; background: #fff; box-shadow: 0 10px 60px rgba(0,0,0,0.4); }
+101|  #stage iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+102|  .counter { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.65); color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 13px; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; z-index: 100; opacity: 0.7; }
+103|  .counter .label { color: rgba(255,255,255,0.7); margin-left: 8px; }
+104|  .overview-btn { position: fixed; top: 20px; left: 20px; background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.85); border: 0; padding: 7px 14px; border-radius: 999px; font-size: 13px; font-family: inherit; cursor: pointer; z-index: 100; opacity: 0.6; }
+105|  .overview-btn:hover { opacity: 1; }
+106|  .nav-zone { position: fixed; top: 0; bottom: 0; width: 15%; cursor: pointer; z-index: 50; }
+107|  .nav-zone.left { left: 0; } .nav-zone.right { right: 0; }
+108|  .nav-hint { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; font-size: 22px; opacity: 0; transition: opacity .2s; }
+109|  .nav-zone.left .nav-hint { left: 20px; } .nav-zone.right .nav-hint { right: 20px; }
+110|  .nav-zone:hover .nav-hint { opacity: 1; }
+111|
+112|  @media print {
+113|    @page { size: 1920px 1080px; margin: 0; }
+114|    html, body { background: #fff; overflow: visible; height: auto; }
+115|    body[data-mode] .overview { display: none !important; }
+116|    #stage { position: static; transform: none !important; box-shadow: none; }
+117|    .counter, .nav-zone, .overview-btn, .start-btn { display: none !important; }
+118|    .print-stack { display: block; }
+119|    .print-stack iframe { width: 1920px; height: 1080px; page-break-after: always; display: block; }
+120|  }
+121|</style>
+122|</head>
+123|<body data-mode="overview">
+124|
+125|<div id="ov-grid" class="overview">
+126|  <div class="overview-title">Overview · 点击任意页进入演示</div>
+127|  <div class="wall-wrap"><div class="wall" id="wall"></div></div>
+128|</div>
+129|
+130|<div id="ov-gallery" class="overview">
+131|  <div class="stage3d"><div class="breathe"><div class="drift-layer" id="driftLayer"><div class="gallery" id="gallery"></div></div></div></div>
+132|  <div class="vignette"></div>
+133|  <div class="overview-title">Infinite Gallery · 悬停暂停 · 点击任意页进入演示</div>
+134|</div>
+135|
+136|<button class="start-btn" id="startBtn">▶ 开始演示</button>
+137|
+138|<div id="present-ui">
+139|  <div id="stage"><iframe id="frame" src="about:blank"></iframe></div>
+140|  <button class="overview-btn" id="overviewBtn">⊞ 概览</button>
+141|  <div class="nav-zone left"  id="navL"><div class="nav-hint">‹</div></div>
+142|  <div class="nav-zone right" id="navR"><div class="nav-hint">›</div></div>
+143|  <div class="counter" id="counter">1 / 1</div>
+144|</div>
+145|
+146|<div class="print-stack" id="printStack" style="display:none;"></div>
+147|
+148|<script>
+149|(function () {
+150|  const W = window.DECK_WIDTH || 1920;
+151|  const H = window.DECK_HEIGHT || 1080;
+152|  const deck = window.DECK_MANIFEST || [];
+153|  const CARD_W = window.GALLERY_CARD_W || 300;
+154|  const DRIFT_SEC = window.GALLERY_DRIFT_SECONDS || 80;
+155|  const stage = document.getElementById('stage');
+156|  const frame = document.getElementById('frame');
+157|  const counter = document.getElementById('counter');
+158|  const printStack = document.getElementById('printStack');
+159|  const wall = document.getElementById('wall');
+160|  const gallery = document.getElementById('gallery');
+161|  const driftLayer = document.getElementById('driftLayer');
+162|  const storageKey = 'deck-index-' + location.pathname;
+163|  let current = 0;
+164|
+165|  stage.style.width = W + 'px'; stage.style.height = H + 'px';
+166|  driftLayer.style.setProperty('--driftSec', DRIFT_SEC + 's');
+167|
+168|  // 概览模式：URL ?ov= > window.DECK_OVERVIEW > 随机(秒%5==0 → 20% 画廊)
+169|  const qp = new URLSearchParams(location.search).get('ov');
+170|  // 用户未指定时按秒数随机：网格(iframe 真页面) 60% / 无限画廊(图片缩略图) 40%。可用 ?ov=grid|gallery 或 window.DECK_OVERVIEW 固定。
+171|  const OVERVIEW = qp || window.DECK_OVERVIEW || ((new Date().getSeconds() % 5 < 2) ? 'gallery' : 'grid');
+172|  document.body.setAttribute('data-ov', OVERVIEW === 'gallery' ? 'gallery' : 'grid');
+173|
+174|  function setMode(mode) {
+175|    document.body.setAttribute('data-mode', mode);
+176|    if (mode === 'present') { fit(); show(current); }
+177|    else { requestAnimationFrame(buildOverview); }
+178|  }
+179|
+180|  /* ─ 媒体（缩略图优先，否则 iframe） ─ */
+181|  function makeCard(idx, useScale, useImg) {
+182|    const card = document.createElement('div');
+183|    card.className = 'card'; card.dataset.idx = idx;
+184|    const item = deck[idx];
+185|    if (useImg && item.thumb) {
+186|      // 仅画廊用：预渲染缩略图，扛无限平铺的性能
+187|      const im = document.createElement('img');
+188|      im.className = 'thumb-img'; im.src = item.thumb; im.decoding = 'async';
+189|      card.appendChild(im);
+190|    } else {
+191|      // 网格默认用：真实 HTML 子页面（清晰、所见即所得）
+192|      const thumb = document.createElement('div');
+193|      thumb.className = 'thumb';
+194|      if (useScale != null) thumb.style.transform = 'scale(' + useScale + ')';
+195|      const ifr = document.createElement('iframe');
+196|      ifr.src = item.file; ifr.setAttribute('scrolling', 'no');
+197|      thumb.appendChild(ifr); card.appendChild(thumb);
+198|    }
+199|    const num = document.createElement('div');
+200|    num.className = 'num';
+201|    num.textContent = (idx + 1) + (item.label ? ' · ' + item.label : '');
+202|    card.appendChild(num);
+203|    card.addEventListener('click', () => { current = idx; setMode('present'); });
+204|    return card;
+205|  }
+206|
+207|  function buildOverview() {
+208|    if (document.body.getAttribute('data-mode') !== 'overview') return;
+209|    if (OVERVIEW === 'gallery') buildGallery(); else buildGrid();
+210|  }
+211|
+212|  /* ════════ 网格墙（自适应） ════════ */
+213|  function buildGrid() {
+214|    const n = deck.length; if (!n) return;
+215|    wall.innerHTML = '';
+216|    for (let i = 0; i < n; i++) wall.appendChild(makeCard(i, null, false));  // 网格 = iframe 真页面
+217|    layoutWall();
+218|  }
+219|  const GRID_PAD = 74;  // #ov-grid scroll 顶部 padding，算动态 transform-origin 用
+220|  function layoutWall() {
+221|    const n = deck.length; if (!n) return;
+222|    const vw = innerWidth, vh = innerHeight, gap = 26;
+223|    const availW = vw * 0.86;                                   // 留 rotateZ 横向余量（强对角也不裁切）
+224|    const target = 280;
+225|    let cols = Math.max(3, Math.min(9, Math.floor((availW + gap) / (target + gap))));
+226|    cols = Math.min(cols, n);
+227|    const rows = Math.ceil(n / cols);
+228|    const cardW = Math.min(target + 40, (availW - (cols - 1) * gap) / cols);
+229|    const cardH = cardW * 9 / 16;
+230|    const baseW = cols * cardW + (cols - 1) * gap;
+231|    const wallH = rows * cardH + (rows - 1) * gap;
+232|    wall.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+233|    wall.style.gap = gap + 'px';
+234|    wall.style.width = baseW + 'px';
+235|    // 单平面(无 preserve-3d)→任意角度都不重叠、可点；fit 与 scroll 都给强对角倾斜
+236|    if (wallH <= vh * 0.80) {
+237|      document.body.setAttribute('data-grid', 'fit');
+238|      const rx = Math.max(11, Math.min(15, 15 - (rows - 2) * 1.1));
+239|      const rz = Math.max(8, Math.min(11, 11 - (rows - 2) * 0.7));
+240|      wall.style.setProperty('--rx', rx); wall.style.setProperty('--rz', rz);
+241|      wall.style.transformOrigin = 'center center';
+242|      const tilt = 'rotateX(' + rx + 'deg) rotateZ(-' + rz + 'deg)';
+243|      wall.style.transform = tilt;
+244|      const r = wall.getBoundingClientRect();
+245|      let s = Math.min(vw * 0.92 / r.width, vh * 0.80 / r.height);
+246|      s = Math.max(0.6, Math.min(s, 1.6));
+247|      wall.style.transform = 'scale(' + s + ') ' + tilt;
+248|    } else {
+249|      // 多页：舒适大小竖向滚动 + 强对角倾斜；transform-origin 跟随滚动→消除高墙 rotateZ 把远端行甩出屏幕
+250|      document.body.setAttribute('data-grid', 'scroll');
+251|      wall.style.setProperty('--rx', 14); wall.style.setProperty('--rz', 7);
+252|      wall.style.transform = 'rotateX(14deg) rotateZ(-7deg)';
+253|      updateScrollOrigin();
+254|    }
+255|    wall.querySelectorAll('.card .thumb').forEach(t => { const c = t.parentElement; if (c.clientWidth) t.style.transform = 'scale(' + (c.clientWidth / W) + ')'; });
+256|  }
+257|  function updateScrollOrigin() {
+258|    if (document.body.getAttribute('data-grid') !== 'scroll') return;
+259|    const ovg = document.getElementById('ov-grid');
+260|    wall.style.transformOrigin = '50% ' + (ovg.scrollTop + window.innerHeight / 2 - GRID_PAD) + 'px';
+261|  }
+262|
+263|  /* ════════ 无限画廊（洗牌不重复） ════════ */
+264|  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+265|  function shuffledRange(n, seed) { const rnd = mulberry32(seed); const a = Array.from({ length: n }, (_, i) => i); for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const tmp = a[i]; a[i] = a[j]; a[j] = tmp; } return a; }
+266|
+267|  function buildGallery() {
+268|    const n = deck.length; if (!n) return;
+269|    const vw = innerWidth, vh = innerHeight, gap = 18;
+270|    const cardW = CARD_W, cardH = cardW * 9 / 16;
+271|    const cellW = cardW + gap, cellH = cardH + gap;
+272|    const visCols = Math.ceil(vw / cellW), visRows = Math.ceil(vh / cellH);
+273|    // tile：宽够铺满；行数取「够铺满」与「装下全部 N 页」的较大者 → 看完所有页才重复
+274|    const tileCols = visCols + 1;
+275|    const tileRows = Math.max(visRows + 1, Math.ceil(n / tileCols));
+276|    const tileCells = tileCols * tileRows;
+277|    const perm = shuffledRange(n, 0x9e3779b9);        // 洗牌一次，打散规则感
+278|    const tilePage = new Array(tileCells);
+279|    for (let k = 0; k < tileCells; k++) tilePage[k] = perm[k % n];
+280|
+281|    const cols = tileCols * 2, rows = tileRows * 2;    // 2× tile 保证无缝漂移
+282|    driftLayer.style.setProperty('--dx', (tileCols * cellW) + 'px');
+283|    driftLayer.style.setProperty('--dy', (tileRows * cellH) + 'px');
+284|    gallery.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cardW + 'px)';
+285|    gallery.style.gridAutoRows = cardH + 'px';
+286|    gallery.style.gap = gap + 'px';
+287|    gallery.innerHTML = '';
+288|    const scale = cardW / W;
+289|    for (let r = 0; r < rows; r++) {
+290|      for (let c = 0; c < cols; c++) {
+291|        const idx = tilePage[(r % tileRows) * tileCols + (c % tileCols)];
+292|        gallery.appendChild(makeCard(idx, scale, true));  // 画廊 = 图片缩略图（性能）
+293|      }
+294|    }
+295|  }
+296|
+297|  /* ════════ 演示 ════════ */
+298|  function fit() {
+299|    const s = Math.min(innerWidth / W, innerHeight / H);
+300|    stage.style.transform = 'translate(' + ((innerWidth - W * s) / 2) + 'px, ' + ((innerHeight - H * s) / 2) + 'px) scale(' + s + ')';
+301|    stage.style.top = '0'; stage.style.left = '0';
+302|  }
+303|  function show(idx) {
+304|    if (idx < 0 || idx >= deck.length) return;
+305|    current = idx;
+306|    if (frame.getAttribute('src') !== deck[idx].file) frame.src = deck[idx].file;
+307|    counter.innerHTML = (idx + 1) + ' / ' + deck.length + ' <span class="label">' + (deck[idx].label || '') + '</span>';
+308|    try { localStorage.setItem(storageKey, String(idx)); } catch (_) {}
+309|    if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
+310|  }
+311|  function next() { show(Math.min(current + 1, deck.length - 1)); }
+312|  function prev() { show(Math.max(current - 1, 0)); }
+313|
+314|  document.addEventListener('keydown', (e) => {
+315|    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+316|    if (e.key === 'Escape') { if (document.body.getAttribute('data-mode') === 'present') { e.preventDefault(); setMode('overview'); } return; }
+317|    if (e.key === 'p' || e.key === 'P') { window.print(); return; }
+318|    if (document.body.getAttribute('data-mode') !== 'present') return;
+319|    switch (e.key) {
+320|      case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); next(); break;
+321|      case 'ArrowLeft': case 'PageUp': e.preventDefault(); prev(); break;
+322|      case 'Home': e.preventDefault(); show(0); break;
+323|      case 'End': e.preventDefault(); show(deck.length - 1); break;
+324|      default: if (e.key >= '1' && e.key <= '9') { const i = parseInt(e.key, 10) - 1; if (i < deck.length) { e.preventDefault(); show(i); } }
+325|    }
+326|  });
+327|  document.getElementById('navL').addEventListener('click', prev);
+328|  document.getElementById('navR').addEventListener('click', next);
+329|  document.getElementById('startBtn').addEventListener('click', () => setMode('present'));
+330|  document.getElementById('overviewBtn').addEventListener('click', () => setMode('overview'));
+331|  let rT;
+332|  window.addEventListener('resize', () => { fit(); clearTimeout(rT); rT = setTimeout(buildOverview, 140); });
+333|  document.getElementById('ov-grid').addEventListener('scroll', updateScrollOrigin, { passive: true });
+334|  window.addEventListener('hashchange', () => { const m = location.hash.match(/^#(\d+)$/); if (m) { current = parseInt(m[1], 10) - 1; setMode('present'); } });
+335|
+336|  const hashMatch = location.hash.match(/^#(\d+)$/);
+337|  if (hashMatch) current = Math.min(parseInt(hashMatch[1], 10) - 1, deck.length - 1);
+338|  else { try { const v = parseInt(localStorage.getItem(storageKey), 10); if (!isNaN(v) && v >= 0 && v < deck.length) current = v; } catch (_) {} }
+339|
+340|  fit(); show(current);
+341|  if (hashMatch) setMode('present'); else { setMode('overview'); buildOverview(); }
+342|
+343|  window.addEventListener('beforeprint', () => { printStack.innerHTML = ''; deck.forEach(item => { const f = document.createElement('iframe'); f.src = item.file; printStack.appendChild(f); }); printStack.style.display = 'block'; stage.style.display = 'none'; });
+344|  window.addEventListener('afterprint', () => { printStack.innerHTML = ''; printStack.style.display = 'none'; stage.style.display = ''; });
+345|})();
+346|</script>
+347|</body>
+348|</html>
+349|

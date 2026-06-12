@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 哪些环节需要AI赋能</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+      align-content: start;
+      margin-top: 8px;
+    }
+
+    .why-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .why-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      transform: translateY(-3px);
+    }
+
+    .why-card .icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 18px;
+    }
+
+    .why-card h4 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .why-card .card-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--color-tag-bg);
+      color: var(--color-tag-text);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 14px;
+      align-self: flex-start;
+    }
+
+    .why-card .card-desc {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin: 0;
+      flex: 1;
+    }
+
+    .why-card .card-footer {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--color-primary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .why-card .card-footer::after {
+      content: "→";
+      transition: transform 0.2s ease;
+    }
+
+    .why-card:hover .card-footer::after {
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">01</div>
+      <h1>哪些环节需要 AI 赋能</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <!-- Subtitle -->
+    <p class="section-subtitle" style="margin-bottom: 28px;">
+      产品经理的日常工作中，这四个环节最值得引入 AI 能力 —— 从信息收集到文档产出，从原型验证到复盘总结
+    </p>
+
+    <!-- 2x2 Grid -->
+    <div class="why-grid">
+      <!-- Card 1: Reddit -->
+      <div class="why-card animate-in animate-in-delay-1">
+        <div class="icon-box">🔍</div>
+        <h4>Reddit 舆情分析</h4>
+        <span class="card-tag">信息收集</span>
+        <p class="card-desc">
+          指定版块 + 关键词 + 内容汇总，自动获取用户真实反馈。<br>
+          无需手动翻阅海量帖子，AI 帮你整理竞品动态与用户痛点。
+        </p>
+        <div class="card-footer">查看案例</div>
+      </div>
+
+      <!-- Card 2: PRD -->
+      <div class="why-card animate-in animate-in-delay-2">
+        <div class="icon-box">📝</div>
+        <h4>PRD 撰写</h4>
+        <span class="card-tag">文档生成</span>
+        <p class="card-desc">
+          功能模块拆解、交叉评审、整合输出，结构化产品文档。<br>
+          从需求脑图到完整 PRD，AI 辅助保持逻辑一致性与格式规范。
+        </p>
+        <div class="card-footer">查看案例</div>
+      </div>
+
+      <!-- Card 3: Demo -->
+      <div class="why-card animate-in animate-in-delay-3">
+        <div class="icon-box">🎨</div>
+        <h4>Demo 生成</h4>
+        <span class="card-tag">快速原型</span>
+        <p class="card-desc">
+          快速原型、交互验证，从需求到可交互 Demo 一键生成。<br>
+          缩短设计与开发的沟通周期，用原型说话而非文档猜测。
+        </p>
+        <div class="card-footer">查看案例</div>
+      </div>
+
+      <!-- Card 4: Daily Review -->
+      <div class="why-card animate-in animate-in-delay-4">
+        <div class="icon-box">📊</div>
+        <h4>每日复盘</h4>
+        <span class="card-tag">效率工具</span>
+        <p class="card-desc">
+          自动化日报、数据洞察，让 AI 帮你回顾一天的工作。<br>
+          自动汇总任务进度、会议要点与待办事项，告别加班补日报。
+        </p>
+        <div class="card-footer">查看案例</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 哪些环节需要 AI 赋能</span>
+      <span class="page-number">03</span>
+    </div>
+  </div>
+</body>
+</html>

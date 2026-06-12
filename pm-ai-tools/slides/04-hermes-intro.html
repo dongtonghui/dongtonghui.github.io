@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 为什么是Hermes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    /* Reasons row */
+    .reasons-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .reason-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      padding: 32px 28px;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    .reason-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 8px 24px var(--color-shadow);
+      transform: translateY(-3px);
+    }
+
+    .reason-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 18px auto;
+    }
+
+    .reason-card h3 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .reason-card p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* Advantages section */
+    .adv-section {
+      background: var(--color-highlight-bg);
+      border: 1px solid var(--color-primary-light);
+      border-radius: 20px;
+      padding: 36px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .adv-section .adv-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .adv-section .adv-header h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .adv-section .adv-header .adv-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 14px;
+      border-radius: 8px;
+      background: var(--color-primary);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .adv-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .adv-tags .tag {
+      font-size: 14px;
+      padding: 6px 16px;
+      border-radius: 8px;
+    }
+
+    .adv-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .adv-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+    }
+
+    .adv-point .check {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--color-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .adv-point p {
+      font-size: 15px;
+      color: var(--color-text);
+      margin: 0;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 6px 0 12px 0;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .connector .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">03</div>
+      <h1>为什么是 Hermes Agent</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <!-- Subtitle -->
+    <p class="section-subtitle" style="margin-bottom: 32px;">
+      面对众多 AI 工具，为什么我们最终选择 Hermes Agent 作为核心底座？
+    </p>
+
+    <!-- 3 Reasons -->
+    <div class="reasons-row">
+      <div class="reason-card animate-in animate-in-delay-1">
+        <div class="reason-icon">🧩</div>
+        <h3>足够全能</h3>
+        <p>不局限某个特定模型，<br>技能扩展性强。<br>想加什么能力就写什么 Skill，<br>不受限于封闭生态。</p>
+      </div>
+
+      <div class="reason-card animate-in animate-in-delay-2">
+        <div class="reason-icon">☁️</div>
+        <h3>多端在线</h3>
+        <p>云端 7×24 小时运行，<br>WebUI、钉钉、飞书、Telegram<br>多平台随时调用，<br>团队协作零门槛。</p>
+      </div>
+
+      <div class="reason-card animate-in animate-in-delay-3">
+        <div class="reason-icon">🔓</div>
+        <h3>避免黑盒</h3>
+        <p>便宜的模型 + 可控的技能<br>也能得到更好的效果。<br>过程可调、可打断、可干预，<br>AI 不再是黑盒。</p>
+      </div>
+    </div>
+
+    <!-- Connector -->
+    <div class="connector">
+      <span class="line"></span>
+      <span>✨ 核心优势一览</span>
+      <span class="line"></span>
+    </div>
+
+    <!-- Advantages section -->
+    <div class="adv-section animate-in animate-in-delay-4">
+      <div class="adv-header">
+        <h3>Hermes Agent 优势</h3>
+        <span class="adv-badge">FREE</span>
+      </div>
+
+      <div class="adv-tags">
+        <span class="tag">💰 完全免费</span>
+        <span class="tag">📦 Rich Skill 支持</span>
+        <span class="tag">💬 WebUI</span>
+        <span class="tag">📱 钉钉</span>
+        <span class="tag">✈️ 飞书</span>
+        <span class="tag">🤖 Telegram</span>
+        <span class="tag">🔄 自主任务</span>
+        <span class="tag">⚡ 自迭代能力</span>
+      </div>
+
+      <div class="adv-points">
+        <div class="adv-point">
+          <div class="check">✓</div>
+          <p>开源免费，无隐藏费用，<br>可私有化部署</p>
+        </div>
+        <div class="adv-point">
+          <div class="check">✓</div>
+          <p>Rich Skill 系统，<br>支持 Python、Shell、API 等多种实现</p>
+        </div>
+        <div class="adv-point">
+          <div class="check">✓</div>
+          <p>多消息渠道接入，<br>一站式管理所有交互</p>
+        </div>
+        <div class="adv-point">
+          <div class="check">✓</div>
+          <p>较强自主任务和自迭代能力，<br>越用越聪明</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 为什么是 Hermes Agent</span>
+      <span class="page-number">04</span>
+    </div>
+  </div>
+</body>
+</html>

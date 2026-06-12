@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>01 · 封面</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    background: linear-gradient(135deg, #0A0A0A 0%, #1a1a2e 50%, #16213e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cover {
+    text-align: center;
+    padding: 80px;
+  }
+  .cover-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 100px;
+    background: rgba(37, 99, 235, 0.15);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    color: #60A5FA;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .cover h1 {
+    font-size: 80px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .cover h1 .highlight {
+    background: linear-gradient(135deg, #60A5FA, #A78BFA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cover .subtitle {
+    font-size: 24px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 48px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cover-accent {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #60A5FA, #A78BFA);
+    border-radius: 2px;
+    margin: 0 auto 40px;
+  }
+  .cover-meta {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+  }
+  .cover-meta span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cover-meta .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+  }
+  .hermes-logo-text {
+    position: absolute;
+    bottom: 40px;
+    left: 100px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.2);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .hermes-logo-text .logo-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #60A5FA;
+  }
+</style>
+</head>
+<body>
+  <div class="cover">
+    <div class="cover-badge">INTERNAL SHARING · 2026</div>
+    <h1>AI 赋能<br><span class="highlight">产品经理工作流</span></h1>
+    <div class="cover-accent"></div>
+    <p class="subtitle">从 Reddit 舆情分析到 PRD 撰写，从原型 Demo 到每日复盘<br>一场关于效率革命的内部实践分享</p>
+    <div class="cover-meta">
+      <span>内部团队分享</span>
+      <span class="dot"></span>
+      <span>产品经理专场</span>
+      <span class="dot"></span>
+      <span>2026 · 6月</span>
+    </div>
+  </div>
+  <div class="hermes-logo-text">
+    <span class="logo-dot"></span>
+    Powered by Hermes Agent
+  </div>
+</body>
+</html>

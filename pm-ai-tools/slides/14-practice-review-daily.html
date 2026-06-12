@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 每日复盘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .daily-content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 36px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    /* Left: Workflow */
+    .daily-left {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .daily-left .left-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .daily-left .left-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    .daily-left .scenario-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .scenario-block {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .scenario-block:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 16px var(--color-shadow);
+    }
+
+    .scenario-block .sc-icon {
+      font-size: 28px;
+      width: 50px;
+      height: 50px;
+      background: var(--color-primary-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .scenario-block .sc-body {
+      flex: 1;
+    }
+
+    .scenario-block .sc-body h4 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin: 0 0 6px 0;
+      letter-spacing: -0.01em;
+    }
+
+    .scenario-block .sc-body p {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .scenario-block .sc-body .sc-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 3px 10px;
+      border-radius: 5px;
+      margin-top: 8px;
+    }
+
+    /* Right: Report card */
+    .daily-right {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .daily-right .right-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .daily-right .right-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    .report-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px var(--color-shadow);
+    }
+
+    .report-card .report-header {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .report-card .report-header .rep-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.02em;
+    }
+
+    .report-card .report-header .rep-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+    }
+
+    .report-card .report-body {
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .report-card .rep-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .report-card .rep-section .rep-sec-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .report-card .rep-section .rep-sec-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    .report-card .rep-section .rep-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .report-card .rep-section .rep-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    .report-card .rep-section .rep-item .item-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .report-card .rep-section .rep-item .item-bullet.blue {
+      background: var(--color-primary);
+    }
+
+    .report-card .rep-section .rep-item .item-bullet.green {
+      background: var(--color-success);
+    }
+
+    .report-card .rep-section .rep-item .item-bullet.orange {
+      background: var(--color-warning);
+    }
+
+    .report-card .rep-section .rep-item .item-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+
+    .report-card .rep-section .rep-item .item-tag.tag-progress {
+      background: #ECFDF5;
+      color: #065F46;
+    }
+
+    .report-card .rep-section .rep-item .item-tag.tag-insight {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+
+    .report-card .rep-section .rep-item .item-tag.tag-plan {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .report-card .rep-ai-suggestion {
+      background: var(--color-primary-light);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .report-card .rep-ai-suggestion .ai-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .report-card .rep-ai-suggestion .ai-text {
+      font-size: 14px;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    .report-card .rep-ai-suggestion .ai-text strong {
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">📅</div>
+      <h1>最佳实践 · 每日复盘</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="daily-content">
+      <!-- Left: workflow scenarios -->
+      <div class="daily-left">
+        <div class="left-title">
+          <span>🔄 复盘场景</span>
+        </div>
+
+        <div class="scenario-blocks">
+          <div class="scenario-block animate-in animate-in-delay-1">
+            <div class="sc-icon">📝</div>
+            <div class="sc-body">
+              <h4>日报自动生成</h4>
+              <p>AI 汇总当日所有对话记录、代码变更和任务进展，自动生成结构化日报。</p>
+              <span class="sc-tag">auto-summary</span>
+            </div>
+          </div>
+
+          <div class="scenario-block animate-in animate-in-delay-2">
+            <div class="sc-icon">📊</div>
+            <div class="sc-body">
+              <h4>数据洞察</h4>
+              <p>从对话日志和任务执行数据中提取关键指标，发现效率瓶颈和异常模式。</p>
+              <span class="sc-tag">data-insight</span>
+            </div>
+          </div>
+
+          <div class="scenario-block animate-in animate-in-delay-3">
+            <div class="sc-icon">🔁</div>
+            <div class="sc-body">
+              <h4>回顾总结</h4>
+              <p>基于历史数据生成回顾总结，追踪已解决问题、待办事项和重复出现的模式。</p>
+              <span class="sc-tag">retrospective</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workflow summary -->
+        <div style="background:white;border:1px solid var(--color-border);border-radius:14px;padding:18px 24px;display:flex;align-items:center;gap:14px;" class="animate-in animate-in-delay-4">
+          <span style="font-size:24px;">⚡</span>
+          <div>
+            <span style="font-size:15px;font-weight:700;color:var(--color-text);">一句话工作流</span>
+            <p style="font-size:14px;color:var(--color-text-secondary);margin:4px 0 0 0;line-height:1.5;">
+              输入当天工作日志 → AI 结构化分析 → 输出复盘报告 + 明日规划 + AI 建议
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Mock report -->
+      <div class="daily-right">
+        <div class="right-title">
+          <span>📋 实现效果</span>
+        </div>
+
+        <div class="report-card animate-in animate-in-delay-2">
+          <div class="report-header">
+            <span class="rep-title">📅 每日复盘报告</span>
+            <span class="rep-date">2026-06-12 · 周五</span>
+          </div>
+
+          <div class="report-body">
+            <!-- Today's completion -->
+            <div class="rep-section">
+              <div class="rep-sec-title">
+                <span>✅ 今日完成</span>
+              </div>
+              <div class="rep-items">
+                <div class="rep-item">
+                  <span class="item-bullet green"></span>
+                  撰写「用户增长策略」PRD v2.0
+                  <span class="item-tag tag-progress">已完成</span>
+                </div>
+                <div class="rep-item">
+                  <span class="item-bullet green"></span>
+                  竞品分析报告：AI 笔记工具赛道
+                  <span class="item-tag tag-progress">已完成</span>
+                </div>
+                <div class="rep-item">
+                  <span class="item-bullet blue"></span>
+                  用户体验评审 · 新 onboarding 流程
+                  <span class="item-tag tag-progress">进行中</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Key findings -->
+            <div class="rep-section">
+              <div class="rep-sec-title">
+                <span>💡 关键发现</span>
+              </div>
+              <div class="rep-items">
+                <div class="rep-item">
+                  <span class="item-bullet blue"></span>
+                  竞品 A 的 AI 摘要功能用户留存率提升 40%
+                  <span class="item-tag tag-insight">洞察</span>
+                </div>
+                <div class="rep-item">
+                  <span class="item-bullet blue"></span>
+                  用户反馈中"上手难度"提及频率上升 25%
+                  <span class="item-tag tag-insight">洞察</span>
+                </div>
+                <div class="rep-item">
+                  <span class="item-bullet orange"></span>
+                  新 onboarding 流程 A/B 测试转化率下降 5%
+                  <span class="item-tag tag-insight">警告</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tomorrow plan -->
+            <div class="rep-section">
+              <div class="rep-sec-title">
+                <span>📌 明日计划</span>
+              </div>
+              <div class="rep-items">
+                <div class="rep-item">
+                  <span class="item-bullet orange"></span>
+                  优化 onboarding A/B 测试方案
+                  <span class="item-tag tag-plan">P0</span>
+                </div>
+                <div class="rep-item">
+                  <span class="item-bullet blue"></span>
+                  评审 AI 摘要功能产品方案
+                  <span class="item-tag tag-plan">P1</span>
+                </div>
+                <div class="rep-item">
+                  <span class="item-bullet blue"></span>
+                  跟进用户反馈：简化注册流程
+                  <span class="item-tag tag-plan">P1</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Suggestion -->
+            <div class="rep-ai-suggestion">
+              <span class="ai-icon">🤖</span>
+              <div class="ai-text">
+                <strong>AI 建议：</strong>针对 onboarding 流程转化率下降的问题，建议增加交互式引导步骤，参考竞品 B 的「5分钟快速上手」模式。同时可将 PRD 中的用户增长策略拆分为 MVP+ 版本，加速迭代。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 每日复盘</span>
+      <span class="page-number">14</span>
+    </div>
+  </div>
+</body>
+</html>

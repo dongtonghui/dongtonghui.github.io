@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · Hermes vs Codex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .vs-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      margin-top: 8px;
+    }
+
+    /* One-liner highlight */
+    .oneliner-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .oneliner-card {
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .oneliner-card.codex-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+    }
+
+    .oneliner-card.hermes-card {
+      background: var(--color-highlight-bg);
+      border: 1px solid var(--color-primary-light);
+    }
+
+    .oneliner-card .vs-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .oneliner-card .vs-label .vs-badge {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .codex-card .vs-label .vs-badge {
+      background: #F3F4F6;
+      color: #6B7280;
+    }
+
+    .hermes-card .vs-label .vs-badge {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .oneliner-card .oneliner-text {
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 0;
+      color: var(--color-text);
+    }
+
+    .oneliner-card .oneliner-text strong {
+      color: var(--color-primary);
+    }
+
+    .codex-card .oneliner-text strong {
+      color: #6B7280;
+    }
+
+    /* Table */
+    .table-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    .vs-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .vs-table thead {
+      background: var(--color-card-bg);
+    }
+
+    .vs-table th {
+      padding: 18px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .vs-table th:first-child {
+      width: 140px;
+    }
+
+    .vs-table td {
+      padding: 16px 24px;
+      font-size: 16px;
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-border);
+      line-height: 1.6;
+    }
+
+    .vs-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .vs-table .dimension {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .vs-table .hermes-cell {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .vs-table .codex-cell {
+      color: var(--color-text);
+    }
+
+    .vs-table tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    .vs-table tbody tr:hover {
+      background: var(--color-card-bg);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">◆</div>
+      <h1>Hermes vs Codex</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="vs-content">
+      <!-- One-liner comparison -->
+      <div class="oneliner-block">
+        <div class="oneliner-card codex-card animate-in animate-in-delay-1">
+          <div class="vs-label">
+            <span class="vs-badge">CODEX</span>
+            <span style="color:#6B7280;">← 对标</span>
+          </div>
+          <p class="oneliner-text">
+            Codex = OpenAI 做的「专业码农」，<br>
+            只写代码，只跑终端，只认 OpenAI 模型。
+          </p>
+        </div>
+
+        <div class="oneliner-card hermes-card animate-in animate-in-delay-2">
+          <div class="vs-label">
+            <span class="vs-badge">HERMES</span>
+            <span style="color:var(--color-primary);">← 我们的选择</span>
+          </div>
+          <p class="oneliner-text">
+            Hermes = 开源的「<strong>全能管家</strong>」，<br>
+            不限模型、不限平台、不限场景，<br>
+            能学能记能进化。
+          </p>
+        </div>
+      </div>
+
+      <!-- Comparison Table -->
+      <div class="table-wrap animate-in animate-in-delay-3">
+        <table class="vs-table">
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>Codex</th>
+              <th>Hermes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="dimension">定位</td>
+              <td class="codex-cell">专业编程助手，专注代码生成</td>
+              <td class="hermes-cell">全能 AI 管家，覆盖全场景</td>
+            </tr>
+            <tr>
+              <td class="dimension">模型绑定</td>
+              <td class="codex-cell">仅 OpenAI 模型</td>
+              <td class="hermes-cell">20+ 模型提供商，支持本地模型</td>
+            </tr>
+            <tr>
+              <td class="dimension">平台覆盖</td>
+              <td class="codex-cell">仅 CLI</td>
+              <td class="hermes-cell">CLI / WebUI / Telegram / Discord / 钉钉 / 飞书 / API</td>
+            </tr>
+            <tr>
+              <td class="dimension">核心能力</td>
+              <td class="codex-cell">代码写作为主，终端操作为辅</td>
+              <td class="hermes-cell">代码 + 文档 + 分析 + 定时 + 多模态</td>
+            </tr>
+            <tr>
+              <td class="dimension">记忆系统</td>
+              <td class="codex-cell">无持久化记忆</td>
+              <td class="hermes-cell">内置记忆系统，跨会话知识积累</td>
+            </tr>
+            <tr>
+              <td class="dimension">技能进化</td>
+              <td class="codex-cell">依赖官方更新</td>
+              <td class="hermes-cell">用户自定义 Skill，自迭代演进</td>
+            </tr>
+            <tr>
+              <td class="dimension">运行方式</td>
+              <td class="codex-cell">本地 CLi 单次运行</td>
+              <td class="hermes-cell">7×24 云端服务，Cron 定时任务</td>
+            </tr>
+            <tr>
+              <td class="dimension">开源</td>
+              <td class="codex-cell">❌ 闭源，受 OpenAI 服务限制</td>
+              <td class="hermes-cell">✅ 完全开源，可私有化部署</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · Hermes vs Codex</span>
+      <span class="page-number">06</span>
+    </div>
+  </div>
+</body>
+</html>

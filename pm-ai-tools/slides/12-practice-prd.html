@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · PRD撰写</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .prd-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 8px;
+    }
+
+    .prd-intro {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .prd-intro strong {
+      color: var(--color-text);
+    }
+
+    /* Horizontal step flow */
+    .prd-flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 20px;
+      position: relative;
+    }
+
+    .prd-flow .flow-step {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .prd-flow .flow-step:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      transform: translateY(-4px);
+    }
+
+    .prd-flow .flow-step .step-num-lg {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--color-border);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .prd-flow .flow-step h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--color-text);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .prd-flow .flow-step p {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin: 0;
+      flex: 1;
+    }
+
+    .prd-flow .flow-arrow {
+      position: absolute;
+      right: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      color: var(--color-primary);
+      opacity: 0.35;
+      z-index: 2;
+    }
+
+    .prd-flow .flow-step:last-child .flow-arrow {
+      display: none;
+    }
+
+    .prd-flow .flow-step .step-icon-sm {
+      font-size: 28px;
+    }
+
+    .prd-flow .flow-step .step-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 3px 10px;
+      border-radius: 5px;
+      align-self: flex-start;
+    }
+
+    /* Bottom section */
+    .prd-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 28px;
+      margin-top: auto;
+    }
+
+    .tool-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 28px;
+      background: var(--color-primary-light);
+      border-radius: 14px;
+    }
+
+    .tool-box .tool-icon-lg {
+      font-size: 32px;
+    }
+
+    .tool-box .tool-name-lg {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .tool-box .tool-desc-lg {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      margin-left: auto;
+    }
+
+    /* Mock PRD output */
+    .prd-output {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .prd-output .prd-out-header {
+      background: var(--color-card-bg);
+      padding: 16px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .prd-output .prd-out-header .mono-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 2px 10px;
+      border-radius: 4px;
+    }
+
+    .prd-output .prd-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .prd-output .prd-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .prd-output .prd-row .prd-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .prd-output .prd-row .prd-val {
+      font-size: 14px;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    .prd-output .prd-row .prd-val .feature-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      padding: 2px 10px;
+      border-radius: 4px;
+      margin: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">📄</div>
+      <h1>最佳实践 · PRD 撰写</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="prd-content">
+      <p class="prd-intro">
+        利用 Hermes 的 <strong>prd-writing skill</strong>，实现从需求拆解到文档输出的全流程 AI 辅助撰写。<br>
+        每一步都有 AI 协作，确保 PRD 的结构完整性、逻辑严谨性和可执行性。
+      </p>
+
+      <!-- Step flow -->
+      <div class="prd-flow">
+        <div class="flow-step animate-in animate-in-delay-1">
+          <div class="step-num-lg">01</div>
+          <div class="step-tag">功能拆解</div>
+          <h3>功能模块拆解</h3>
+          <p>AI 自动对产品需求进行结构化拆解，识别核心功能模块、子功能、边界条件。</p>
+          <div class="flow-arrow">→</div>
+        </div>
+
+        <div class="flow-step animate-in animate-in-delay-2">
+          <div class="step-num-lg">02</div>
+          <div class="step-tag">交叉评审</div>
+          <h3>交叉评审</h3>
+          <p>多个 AI 角色（PM + 开发 + 设计）模拟评审，提前发现逻辑漏洞和需求冲突。</p>
+          <div class="flow-arrow">→</div>
+        </div>
+
+        <div class="flow-step animate-in animate-in-delay-3">
+          <div class="step-num-lg">03</div>
+          <div class="step-tag">整合输出</div>
+          <h3>整合输出</h3>
+          <p>综合评审意见，自动生成标准化 PRD 文档，包含背景、目标、范围、功能规格。</p>
+          <div class="flow-arrow">→</div>
+        </div>
+
+        <div class="flow-step animate-in animate-in-delay-4">
+          <div class="step-num-lg">04</div>
+          <div class="step-tag">UI Demo</div>
+          <h3>UI Demo 设计</h3>
+          <p>AI 基于 PRD 内容生成 UI 原型描述或 Excalidraw 草图，加速设计评审。</p>
+        </div>
+      </div>
+
+      <!-- Bottom: Tool + Mock PRD -->
+      <div class="prd-bottom">
+        <div class="tool-box animate-in animate-in-delay-3">
+          <span class="tool-icon-lg">🧰</span>
+          <span class="tool-name-lg">prd-writing skill</span>
+          <span class="tool-desc-lg">→ 一键生成结构化文档</span>
+        </div>
+
+        <div class="prd-output animate-in animate-in-delay-4">
+          <div class="prd-out-header">
+            <span>📄 模拟 PRD 输出结构</span>
+            <span class="mono-tag">v1.0</span>
+          </div>
+          <div class="prd-body">
+            <div class="prd-row">
+              <span class="prd-key">背景</span>
+              <span class="prd-val">用户反馈流程断点，需优化任务协作体验</span>
+            </div>
+            <div class="prd-row">
+              <span class="prd-key">目标</span>
+              <span class="prd-val">提升团队协作效率 30%，降低沟通成本</span>
+            </div>
+            <div class="prd-row">
+              <span class="prd-key">范围</span>
+              <span class="prd-val">
+                <span class="feature-tag">✅ 任务看板</span>
+                <span class="feature-tag">✅ 实时协作</span>
+                <span class="feature-tag">✅ 通知系统</span>
+                <span class="feature-tag" style="background:#FEF2F2;color:#991B1B;">❌ AI 生成</span>
+              </span>
+            </div>
+            <div class="prd-row">
+              <span class="prd-key">规格</span>
+              <span class="prd-val">8 个核心功能点 · 12 个用户故事 · 3 个技术约束</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · PRD 撰写</span>
+      <span class="page-number">12</span>
+    </div>
+  </div>
+</body>
+</html>

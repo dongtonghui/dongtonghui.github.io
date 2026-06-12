@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 安装 WebUI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .webui-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 16px;
+    }
+
+    .webui-intro {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .webui-intro strong {
+      color: var(--color-text);
+    }
+
+    .webui-steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+    }
+
+    .webui-step-card {
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .webui-step-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      transform: translateY(-3px);
+    }
+
+    .webui-step-card .step-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .webui-step-card .step-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--color-primary);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .webui-step-card .step-icon {
+      font-size: 32px;
+    }
+
+    .webui-step-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .webui-step-card p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .webui-step-card .cmd-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--color-primary);
+      font-weight: 600;
+      background: var(--color-primary-light);
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin: 8px 0 0 0;
+      display: block;
+    }
+
+    .webui-step-card .url-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: white;
+      border: 2px dashed var(--color-primary-light);
+      padding: 14px 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 4px 0;
+    }
+
+    .webui-step-card .arrow-connector {
+      position: absolute;
+      right: -18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      color: var(--color-primary);
+      opacity: 0.4;
+    }
+
+    .webui-step-card:last-child .arrow-connector {
+      display: none;
+    }
+
+    .advantages-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-top: 4px;
+    }
+
+    .advantage-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 24px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .advantage-card .adv-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      background: var(--color-primary-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .advantage-card .adv-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .advantage-card .adv-desc {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">🌐</div>
+      <h1>安装 Hermes · WebUI</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="webui-content">
+      <p class="webui-intro">
+        在 CLI 基础上，启动 <strong>Hermes WebUI</strong> 即可获得图形化操作界面，一站式管理对话、模型、工具和技能。
+      </p>
+
+      <!-- 3-step flow -->
+      <div class="webui-steps">
+        <div class="webui-step-card animate-in animate-in-delay-1">
+          <div class="step-head">
+            <div class="step-badge">01</div>
+            <div class="step-icon">🚀</div>
+          </div>
+          <h3>启动服务</h3>
+          <p>运行以下命令启动 WebUI 服务，默认监听 9119 端口。</p>
+          <code class="cmd-line">hermes dashboard --port 9119</code>
+          <div class="arrow-connector">→</div>
+        </div>
+
+        <div class="webui-step-card animate-in animate-in-delay-2">
+          <div class="step-head">
+            <div class="step-badge">02</div>
+            <div class="step-icon">🔗</div>
+          </div>
+          <h3>浏览器访问</h3>
+          <p>打开浏览器，访问本地地址即可进入 WebUI 控制台。</p>
+          <div class="url-line">http://localhost:9119</div>
+          <div class="arrow-connector">→</div>
+        </div>
+
+        <div class="webui-step-card animate-in animate-in-delay-3">
+          <div class="step-head">
+            <div class="step-badge">03</div>
+            <div class="step-icon">⚙️</div>
+          </div>
+          <h3>个性配置</h3>
+          <p>在 WebUI 中可视化配置模型提供商、启用工具、安装和管理技能。</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+            <span class="tag">🤖 模型</span>
+            <span class="tag">🔧 工具</span>
+            <span class="tag">🧠 技能</span>
+            <span class="tag">📎 记忆</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advantages -->
+      <div class="advantages-section">
+        <div class="advantage-card animate-in animate-in-delay-3">
+          <div class="adv-icon">🖥</div>
+          <div>
+            <div class="adv-title">图形化界面</div>
+            <p class="adv-desc">告别命令行，通过直观的 UI 面板完成对话、配置和管理操作。</p>
+          </div>
+        </div>
+        <div class="advantage-card animate-in animate-in-delay-4">
+          <div class="adv-icon">🧩</div>
+          <div>
+            <div class="adv-title">全功能可配置</div>
+            <p class="adv-desc">对话模式、模型选择、工具开关、技能管理，所有核心功能一览无余。</p>
+          </div>
+        </div>
+        <div class="advantage-card animate-in animate-in-delay-5">
+          <div class="adv-icon">💬</div>
+          <div>
+            <div class="adv-title">实时对话</div>
+            <p class="adv-desc">流式响应输出，即时查看 AI 思考与执行过程，交互体验更佳。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 安装 WebUI</span>
+      <span class="page-number">09</span>
+    </div>
+  </div>
+</body>
+</html>

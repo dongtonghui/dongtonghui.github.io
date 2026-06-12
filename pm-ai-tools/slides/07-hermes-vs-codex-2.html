@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 工具 vs 经验</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .vs2-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      margin-top: 8px;
+    }
+
+    /* Philosophy comparison cards */
+    .philo-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .philo-card {
+      border-radius: 20px;
+      padding: 36px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .philo-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px var(--color-shadow);
+    }
+
+    .philo-card.codex-philo {
+      background: linear-gradient(145deg, #FAFAFA, #F3F4F6);
+      border: 1px solid var(--color-border);
+    }
+
+    .philo-card.hermes-philo {
+      background: linear-gradient(145deg, #EEF2FF, #DBEAFE);
+      border: 1px solid var(--color-primary-light);
+    }
+
+    .philo-card .philo-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .philo-card .philo-label .philo-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .codex-philo .philo-badge {
+      background: #E5E7EB;
+      color: #4B5563;
+    }
+
+    .hermes-philo .philo-badge {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .philo-card .philo-label .philo-sub {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .philo-card .philo-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--color-text);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .philo-card .philo-desc {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    .philo-card .philo-desc strong {
+      color: var(--color-text);
+    }
+
+    .philo-card .philo-icon {
+      font-size: 40px;
+      margin-bottom: 4px;
+    }
+
+    /* Philosophy metaphor */
+    .philo-metaphor {
+      font-size: 16px;
+      padding: 16px 24px;
+      background: white;
+      border-radius: 12px;
+      border: 1px dashed var(--color-border);
+      margin-top: 4px;
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+    }
+
+    .codex-philo .philo-metaphor {
+      border-color: #D1D5DB;
+    }
+
+    .hermes-philo .philo-metaphor {
+      border-color: var(--color-primary-light);
+      background: rgba(37, 99, 235, 0.03);
+    }
+
+    .philo-metaphor .meta-em {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .hermes-philo .philo-metaphor .meta-em {
+      color: var(--color-primary);
+    }
+
+    /* Divider */
+    .vs-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .vs-divider .vs-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+    }
+
+    .vs-divider .vs-badge-lg {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 20px;
+      border-radius: 20px;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    /* Detail table */
+    .table-wrap-2 {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .detail-table thead {
+      background: var(--color-card-bg);
+    }
+
+    .detail-table th {
+      padding: 16px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .detail-table th:first-child {
+      width: 100px;
+    }
+
+    .detail-table td {
+      padding: 16px 24px;
+      font-size: 16px;
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-border);
+      line-height: 1.6;
+    }
+
+    .detail-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .detail-table .dim-label {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .detail-table .hermes-highlight {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .detail-table tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    .detail-table tbody tr:hover {
+      background: var(--color-card-bg);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">◆</div>
+      <h1>工具 vs 经验：两种扩展哲学</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="vs2-content">
+      <!-- Philosophy cards -->
+      <div class="philo-row">
+        <!-- Codex / Extensions -->
+        <div class="philo-card codex-philo animate-in animate-in-delay-1">
+          <div class="philo-icon">🔧</div>
+          <div class="philo-label">
+            <span class="philo-badge">CODEX / MCP</span>
+            <span class="philo-sub">工具替换</span>
+          </div>
+          <h3 class="philo-title">给工人换不同的<br>电钻、锯子</h3>
+          <p class="philo-desc">
+            更多的 <strong>工具（Tools）</strong>—— 不同的螺丝刀、不同的扳手，<br>
+            但工人还是那个工人，做完一个项目就忘掉一个。
+          </p>
+          <div class="philo-metaphor">
+            🔩 <span class="meta-em">工具思维</span> —— 每次任务都是全新开始，<br>
+            工具虽多，但经验不留存，下次还得从头教。
+          </div>
+        </div>
+
+        <!-- Hermes Skills -->
+        <div class="philo-card hermes-philo animate-in animate-in-delay-2">
+          <div class="philo-icon">🧠</div>
+          <div class="philo-label">
+            <span class="philo-badge">HERMES</span>
+            <span class="philo-sub">经验积累</span>
+          </div>
+          <h3 class="philo-title">老师傅带的徒弟<br>越来越熟练</h3>
+          <p class="philo-desc">
+            徒弟不仅会用电钻，还写了本 <strong>《老师傅的装修笔记》</strong><br>
+            经验、窍门、避坑指南，全记下来，下次直接查。
+          </p>
+          <div class="philo-metaphor">
+            📖 <span class="meta-em">经验思维</span> —— 技能即知识，跨会话积累，<br>
+            每一次使用都在让 AI 变得更懂你的业务。
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="vs-divider">
+        <span class="vs-line"></span>
+        <span class="vs-badge-lg">✦ 详细对比 ✦</span>
+        <span class="vs-line"></span>
+      </div>
+
+      <!-- Detail table -->
+      <div class="table-wrap-2 animate-in animate-in-delay-3">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>Codex Extensions / MCP</th>
+              <th>Hermes Skills</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="dim-label">名称</td>
+              <td>Extensions / MCP Tools</td>
+              <td class="hermes-highlight">Skills（技能）</td>
+            </tr>
+            <tr>
+              <td class="dim-label">本质</td>
+              <td>工具集合 —— 提供更多可调用的原子操作</td>
+              <td class="hermes-highlight">知识封装 —— 包含指令、经验、工作流</td>
+            </tr>
+            <tr>
+              <td class="dim-label">作用</td>
+              <td>扩充能力边界，让 AI 能做更多事</td>
+              <td class="hermes-highlight">提升任务质量，让 AI 更懂怎么做</td>
+            </tr>
+            <tr>
+              <td class="dim-label">进化方式</td>
+              <td>手动添加/更新工具定义</td>
+              <td class="hermes-highlight">可自迭代优化，从反馈中学习改进</td>
+            </tr>
+            <tr>
+              <td class="dim-label">跨会话</td>
+              <td>无状态，每次会话从零开始</td>
+              <td class="hermes-highlight">有记忆，跨会话积累经验和知识</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 工具 vs 经验</span>
+      <span class="page-number">07</span>
+    </div>
+  </div>
+</body>
+</html>

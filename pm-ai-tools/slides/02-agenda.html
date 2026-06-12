@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 目录</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .agenda-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      flex: 1;
+      align-content: start;
+      margin-top: 16px;
+    }
+
+    .agenda-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 28px 32px;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      transition: all 0.25s ease;
+      cursor: default;
+    }
+
+    .agenda-item:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 8px 24px var(--color-shadow);
+      transform: translateY(-2px);
+    }
+
+    .agenda-number {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--color-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .agenda-content h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .agenda-content p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .agenda-intro {
+      margin-bottom: 12px;
+    }
+
+    .agenda-intro p {
+      font-size: 18px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">◆</div>
+      <h1>目录</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <!-- Intro -->
+    <div class="agenda-intro">
+      <p>从 AI 能力诊断到 Hermes 实战落地，六大章节带你构建 AI 驱动的产品经理工作流</p>
+    </div>
+
+    <!-- Agenda Grid -->
+    <div class="agenda-grid">
+      <div class="agenda-item animate-in animate-in-delay-1">
+        <div class="agenda-number">01</div>
+        <div class="agenda-content">
+          <h3>哪些环节需要 AI 赋能</h3>
+          <p>识别产品经理日常工作中最值得 AI 介入的高频场景与痛点环节</p>
+        </div>
+      </div>
+
+      <div class="agenda-item animate-in animate-in-delay-2">
+        <div class="agenda-number">02</div>
+        <div class="agenda-content">
+          <h3>选择怎样的工具</h3>
+          <p>评估 AI 工具的核心标准：可控性、扩展性、成本与安全</p>
+        </div>
+      </div>
+
+      <div class="agenda-item animate-in animate-in-delay-3">
+        <div class="agenda-number">03</div>
+        <div class="agenda-content">
+          <h3>Hermes 架构优势</h3>
+          <p>深入了解 Hermes Agent 的三层架构设计与技术亮点</p>
+        </div>
+      </div>
+
+      <div class="agenda-item animate-in animate-in-delay-4">
+        <div class="agenda-number">04</div>
+        <div class="agenda-content">
+          <h3>如何安装</h3>
+          <p>从环境准备到一键部署，5 分钟上手 Hermes Agent</p>
+        </div>
+      </div>
+
+      <div class="agenda-item animate-in animate-in-delay-5">
+        <div class="agenda-number">05</div>
+        <div class="agenda-content">
+          <h3>最佳实践</h3>
+          <p>真实场景中的 Skill 开发与工作流编排实战案例</p>
+        </div>
+      </div>
+
+      <div class="agenda-item animate-in animate-in-delay-6">
+        <div class="agenda-number">06</div>
+        <div class="agenda-content">
+          <h3>其它技巧</h3>
+          <p>效率翻倍的小技巧、踩坑经验与社区资源汇总</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 目录</span>
+      <span class="page-number">02</span>
+    </div>
+  </div>
+</body>
+</html>

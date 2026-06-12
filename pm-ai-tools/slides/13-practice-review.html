@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · 文案Review &amp; 技能进化</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    .review-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-top: 8px;
+    }
+
+    /* Two halves layout */
+    .review-halves {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      flex: 1;
+    }
+
+    .review-half {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .half-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .half-header .half-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .half-header .half-badge.green-badge {
+      background: var(--color-success);
+    }
+
+    .half-header .half-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-text);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    /* Workflow step cards */
+    .wflow-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .wflow-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      transition: all 0.2s ease;
+    }
+
+    .wflow-item:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 16px var(--color-shadow);
+    }
+
+    .wflow-item .wflow-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--color-primary);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .wflow-item .wflow-num.green-num {
+      background: var(--color-success);
+    }
+
+    .wflow-item .wflow-body {
+      flex: 1;
+    }
+
+    .wflow-item .wflow-body .wflow-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .wflow-item .wflow-body .wflow-desc {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .wflow-item .wflow-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    /* Tool tags */
+    .tool-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      background: var(--color-primary-light);
+      border-radius: 10px;
+    }
+
+    .tool-row .tool-icon {
+      font-size: 22px;
+    }
+
+    .tool-row .tool-txt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .tool-row .tool-sub {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-left: auto;
+    }
+
+    .tool-row.green-tool {
+      background: #ECFDF5;
+    }
+
+    .tool-row.green-tool .tool-txt {
+      color: #065F46;
+    }
+
+    /* Evolution visualization */
+    .evo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+
+    .evo-row .evo-steps {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .evo-row .evo-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .evo-row .evo-step .evo-icon {
+      font-size: 22px;
+      width: 42px;
+      height: 42px;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .evo-row .evo-step .evo-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-align: center;
+    }
+
+    .evo-row .evo-arrow-sm {
+      font-size: 18px;
+      color: var(--color-success);
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">✏️</div>
+      <h1>最佳实践 · 文案 Review &amp; 技能进化</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <div class="review-content">
+      <div class="review-halves">
+        <!-- Left: Copy Review -->
+        <div class="review-half">
+          <div class="half-header">
+            <div class="half-badge">01</div>
+            <h3 class="half-title">文案 Review</h3>
+          </div>
+
+          <div class="wflow-list">
+            <div class="wflow-item animate-in animate-in-delay-1">
+              <div class="wflow-num">1</div>
+              <div class="wflow-icon">🔍</div>
+              <div class="wflow-body">
+                <div class="wflow-title">发现业务 &amp; 目标用户</div>
+                <p class="wflow-desc">AI 自动分析业务背景，明确产品定位和目标受众画像。</p>
+              </div>
+            </div>
+
+            <div class="wflow-item animate-in animate-in-delay-2">
+              <div class="wflow-num">2</div>
+              <div class="wflow-icon">🎭</div>
+              <div class="wflow-body">
+                <div class="wflow-title">建立品牌人设</div>
+                <p class="wflow-desc">定义品牌语调、风格指南、关键信息传达策略。</p>
+              </div>
+            </div>
+
+            <div class="wflow-item animate-in animate-in-delay-3">
+              <div class="wflow-num">3</div>
+              <div class="wflow-icon">📝</div>
+              <div class="wflow-body">
+                <div class="wflow-title">逐条评审文案</div>
+                <p class="wflow-desc">逐段检查文案的清晰度、一致性、说服力和行动号召力。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-row animate-in animate-in-delay-4">
+            <span class="tool-icon">🧰</span>
+            <span class="tool-txt">自定义 copy-review skill</span>
+            <span class="tool-sub">+ darwin 自进化</span>
+          </div>
+        </div>
+
+        <!-- Right: Skill Evolution -->
+        <div class="review-half">
+          <div class="half-header">
+            <div class="half-badge green-badge">02</div>
+            <h3 class="half-title">技能进化</h3>
+          </div>
+
+          <div class="wflow-list">
+            <div class="wflow-item animate-in animate-in-delay-2">
+              <div class="wflow-num green-num">1</div>
+              <div class="wflow-icon">🧠</div>
+              <div class="wflow-body">
+                <div class="wflow-title">AI 评估自身技能输出</div>
+                <p class="wflow-desc">AI 调用 darwin 框架，对已执行的 skill 输出进行多维度评估打分。</p>
+              </div>
+            </div>
+
+            <div class="wflow-item animate-in animate-in-delay-3">
+              <div class="wflow-num green-num">2</div>
+              <div class="wflow-icon">🔎</div>
+              <div class="wflow-body">
+                <div class="wflow-title">识别短板和优化点</div>
+                <p class="wflow-desc">基于评估结果定位薄弱环节，如遗漏场景、表达不清、结构不完整。</p>
+              </div>
+            </div>
+
+            <div class="wflow-item animate-in animate-in-delay-4">
+              <div class="wflow-num green-num">3</div>
+              <div class="wflow-icon">🔄</div>
+              <div class="wflow-body">
+                <div class="wflow-title">自动生成改进版本</div>
+                <p class="wflow-desc">AI 生成优化后的 skill 新版本，覆盖旧 skill，实现技能迭代升级。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-row green-tool animate-in animate-in-delay-4">
+            <span class="tool-icon">🧰</span>
+            <span class="tool-txt">darwin-skill</span>
+            <span class="tool-sub">→ 让技能自己变聪明</span>
+          </div>
+
+          <!-- Evolution visual -->
+          <div class="evo-row animate-in animate-in-delay-5">
+            <div class="evo-steps">
+              <div class="evo-step">
+                <div class="evo-icon">📤</div>
+                <span class="evo-label">执行技能</span>
+              </div>
+              <span class="evo-arrow-sm">→</span>
+              <div class="evo-step">
+                <div class="evo-icon">📊</div>
+                <span class="evo-label">AI 评估</span>
+              </div>
+              <span class="evo-arrow-sm">→</span>
+              <div class="evo-step">
+                <div class="evo-icon">🔧</div>
+                <span class="evo-label">定位短板</span>
+              </div>
+              <span class="evo-arrow-sm">→</span>
+              <div class="evo-step">
+                <div class="evo-icon" style="background:var(--color-success);color:white;border-color:var(--color-success);">✨</div>
+                <span class="evo-label" style="color:var(--color-success);font-weight:700;">进化完成</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · 文案 Review &amp; 技能进化</span>
+      <span class="page-number">13</span>
+    </div>
+  </div>
+</body>
+</html>

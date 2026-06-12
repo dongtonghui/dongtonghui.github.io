@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>AI赋能产品经理工作流 · Hermes架构优势</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <style>
+    /* Architecture Diagram */
+    .arch-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .arch-layer {
+      position: relative;
+      border-radius: 16px;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      transition: all 0.3s ease;
+    }
+
+    .arch-layer:hover {
+      transform: scale(1.01);
+    }
+
+    .arch-layer .layer-label {
+      position: absolute;
+      left: -14px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Layer 1 - Top: Interaction */
+    .layer-top {
+      background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+      border: 1px solid #93C5FD;
+      padding: 20px 40px;
+      gap: 12px;
+    }
+
+    .layer-top .layer-label {
+      color: #1D4ED8;
+    }
+
+    /* Layer 2 - Middle: Hermes Core */
+    .layer-middle {
+      background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+      border: 1px solid #86EFAC;
+      padding: 28px 40px;
+      gap: 20px;
+    }
+
+    .layer-middle .layer-label {
+      color: #15803D;
+    }
+
+    /* Layer 3 - Bottom: Models */
+    .layer-bottom {
+      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+      border: 1px solid #FCD34D;
+      padding: 20px 40px;
+      gap: 12px;
+    }
+
+    .layer-bottom .layer-label {
+      color: #92400E;
+    }
+
+    /* Items in layers */
+    .arch-item {
+      background: white;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.06);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .arch-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .arch-item .item-icon {
+      font-size: 16px;
+    }
+
+    .arch-item-sm {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .arch-core {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      font-size: 16px;
+      padding: 12px 28px;
+    }
+
+    .arch-core:hover {
+      background: var(--color-primary-dark);
+      transform: translateY(-2px);
+    }
+
+    /* Arrow connectors */
+    .arrow-down {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 36px;
+      position: relative;
+    }
+
+    .arrow-down .arrow-line {
+      width: 2px;
+      height: 20px;
+      background: var(--color-border);
+    }
+
+    .arrow-down .arrow-head {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid var(--color-border);
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      position: relative;
+    }
+
+    .flow-arrow svg {
+      overflow: visible;
+    }
+
+    /* Layer descriptors */
+    .layer-desc {
+      position: absolute;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      opacity: 0.7;
+    }
+
+    .section-subtitle-arch {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      margin: 0 0 8px 0;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="chapter-badge">◆</div>
+      <h1>Hermes 架构优势</h1>
+      <div class="header-line"></div>
+    </div>
+
+    <p class="section-subtitle-arch">
+      三层解耦架构 —— 模型层、核心层、交互层各自独立，灵活组合，让 AI 能力真正可控可扩展
+    </p>
+
+    <!-- Architecture Diagram -->
+    <div class="arch-wrapper">
+      <!-- ===== Layer 1: Interaction ===== -->
+      <div class="arch-layer layer-top animate-in animate-in-delay-1">
+        <span class="layer-label">交互层</span>
+        <span class="arch-item"><span class="item-icon">🌐</span> CLI</span>
+        <span class="arch-item"><span class="item-icon">💻</span> WebUI</span>
+        <span class="arch-item"><span class="item-icon">🤖</span> Telegram</span>
+        <span class="arch-item"><span class="item-icon">💬</span> Discord</span>
+        <span class="arch-item"><span class="item-icon">📱</span> 钉钉</span>
+        <span class="arch-item"><span class="item-icon">✈️</span> 飞书</span>
+        <span class="arch-item"><span class="item-icon">🔌</span> API</span>
+        <span class="layer-desc">多渠道接入</span>
+      </div>
+
+      <!-- Arrow 1 -->
+      <div class="flow-arrow">
+        <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+          <defs>
+            <marker id="arrowDown" markerWidth="10" markerHeight="8" refX="5" refY="4" orient="auto">
+              <path d="M0,0 L10,4 L0,8 Z" fill="#93C5FD"/>
+            </marker>
+          </defs>
+          <line x1="60" y1="0" x2="60" y2="28" stroke="#93C5FD" stroke-width="2" marker-end="url(#arrowDown)" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+
+      <!-- ===== Layer 2: Hermes Core ===== -->
+      <div class="arch-layer layer-middle animate-in animate-in-delay-2">
+        <span class="layer-label">核心层</span>
+        <span class="arch-item arch-core">⚡ Hermes Agent Core</span>
+        <span class="arch-item arch-item-sm">🧩 Skills 系统</span>
+        <span class="arch-item arch-item-sm">🧠 记忆系统</span>
+        <span class="arch-item arch-item-sm">🔧 工具系统</span>
+        <span class="arch-item arch-item-sm">🌉 多平台 Gateway</span>
+        <span class="arch-item arch-item-sm">📋 Cron 定时</span>
+        <span class="layer-desc">核心引擎</span>
+      </div>
+
+      <!-- Arrow 2 -->
+      <div class="flow-arrow">
+        <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+          <defs>
+            <marker id="arrowDown2" markerWidth="10" markerHeight="8" refX="5" refY="4" orient="auto">
+              <path d="M0,0 L10,4 L0,8 Z" fill="#FCD34D"/>
+            </marker>
+          </defs>
+          <line x1="60" y1="0" x2="60" y2="28" stroke="#FCD34D" stroke-width="2" marker-end="url(#arrowDown2)" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+
+      <!-- ===== Layer 3: Model Providers ===== -->
+      <div class="arch-layer layer-bottom animate-in animate-in-delay-3">
+        <span class="layer-label">模型层</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">🔵</span> OpenAI</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">🟢</span> Anthropic</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">🟣</span> DeepSeek</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">🔴</span> Kimi</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">⚪</span> Gemini</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">🟡</span> 本地模型</span>
+        <span class="arch-item arch-item-sm"><span class="item-icon">➕</span> 20+ 提供商</span>
+        <span class="arch-item arch-item-sm" style="background:#1F2937;color:white;border:none;"><span class="item-icon">🔗</span> Ollama / vLLM</span>
+        <span class="layer-desc">多模型支持</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span>AI赋能产品经理工作流 · Hermes 架构优势</span>
+      <span class="page-number">05</span>
+    </div>
+  </div>
+</body>
+</html>

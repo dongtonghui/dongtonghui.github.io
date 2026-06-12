@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>详细对比 · AI赋能产品经理工作流</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared/tokens.css">
+  <style>
+    /* ---- Slide-specific: 16-comparison-detail ---- */
+    .comparison-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      padding-top: var(--space-sm);
+    }
+
+    /* Brand labels */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-sm);
+    }
+
+    .brand-tag {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 8px 28px;
+      border-radius: var(--radius-md);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .brand-tag.hermes {
+      background: var(--color-black);
+      color: var(--color-white);
+    }
+
+    .brand-tag.codex {
+      background: var(--color-gray-light);
+      color: var(--color-gray-dark);
+    }
+
+    .brand-tag .vs {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-gray);
+      margin: 0 var(--space-sm);
+    }
+
+    .vs-divider {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-gray);
+    }
+
+    /* Table wrapper */
+    .table-wrapper {
+      flex: 1;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-gray-light);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14.5px;
+    }
+
+    .comparison-table thead th {
+      padding: 14px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-align: left;
+      border-bottom: 2px solid var(--color-gray-light);
+    }
+
+    .comparison-table thead th:first-child {
+      background: var(--color-black);
+      color: var(--color-white);
+      width: 140px;
+    }
+
+    .comparison-table thead th:nth-child(2) {
+      background: var(--color-blue);
+      color: var(--color-white);
+    }
+
+    .comparison-table thead th:nth-child(3) {
+      background: var(--color-gray-light);
+      color: var(--color-gray-dark);
+    }
+
+    .comparison-table tbody td {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--color-gray-light);
+      vertical-align: middle;
+      line-height: 1.5;
+    }
+
+    .comparison-table tbody td:first-child {
+      font-weight: 600;
+      color: var(--color-gray-dark);
+      background: #FAFBFC;
+      font-size: 13.5px;
+    }
+
+    .comparison-table tbody td:nth-child(2) {
+      background: var(--color-blue-light);
+      color: var(--color-blue-dark);
+    }
+
+    .comparison-table tbody td:nth-child(3) {
+      background: var(--color-white);
+      color: var(--color-gray-dark);
+    }
+
+    .comparison-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table tbody tr:hover td:first-child {
+      background: #F0F2F5;
+    }
+    .comparison-table tbody tr:hover td:nth-child(2) {
+      background: #D0E4FF;
+    }
+
+    /* Status indicators */
+    .status-check {
+      color: var(--color-green);
+      font-weight: 700;
+    }
+    .status-cross {
+      color: #DC2626;
+      font-weight: 700;
+    }
+
+    /* Summary block */
+    .summary-block {
+      background: var(--color-blue-light);
+      border-left: 4px solid var(--color-blue);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: var(--space-md) var(--space-lg);
+      flex-shrink: 0;
+    }
+
+    .summary-block p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-gray-dark);
+    }
+
+    .summary-block strong {
+      color: var(--color-blue-dark);
+    }
+
+    .mono-sm {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <span class="section-number">16</span>
+      <h1 class="section-title">Hermes vs Codex · 完整对比</h1>
+    </div>
+
+    <!-- Comparison Content -->
+    <div class="comparison-content">
+      <!-- Brand Labels -->
+      <div class="brand-header">
+        <div class="brand-tag hermes">
+          <span>⚡</span> Hermes
+        </div>
+        <span class="vs-divider">VS</span>
+        <div class="brand-tag codex">
+          <span>⌨️</span> Codex CLI
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>Hermes</th>
+              <th>Codex CLI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>定位</td>
+              <td>开源 AI Agent 框架</td>
+              <td>OpenAI 官方编码 Agent CLI</td>
+            </tr>
+            <tr>
+              <td>模型绑定</td>
+              <td>任意模型：OpenRouter / Anthropic / DeepSeek 等 20+</td>
+              <td>仅 OpenAI 模型</td>
+            </tr>
+            <tr>
+              <td>平台覆盖</td>
+              <td>多平台 Gateway：Telegram / Discord / Slack / WebUI 等 10+</td>
+              <td>仅终端 CLI</td>
+            </tr>
+            <tr>
+              <td>核心能力</td>
+              <td>通用 Agent：编码 / 研究 / 系统管理 / 数据分析 等</td>
+              <td>专注编码</td>
+            </tr>
+            <tr>
+              <td>记忆系统</td>
+              <td>持久化记忆，跨会话保存</td>
+              <td>无持久记忆</td>
+            </tr>
+            <tr>
+              <td>技能进化</td>
+              <td>Skills 自进化，越用越懂你</td>
+              <td>无技能系统</td>
+            </tr>
+            <tr>
+              <td>运行方式</td>
+              <td><span class="mono-sm">delegate_task</span> 子任务 + 独立进程</td>
+              <td><span class="mono-sm">codex exec</span> 单任务</td>
+            </tr>
+            <tr>
+              <td>安全模式</td>
+              <td>工具调用审批（可 <span class="mono-sm">/yolo</span> 跳过）</td>
+              <td><span class="mono-sm">--full-auto</span> 沙箱 / <span class="mono-sm">--yolo</span> 无沙箱</td>
+            </tr>
+            <tr>
+              <td>开源</td>
+              <td><span class="status-check">✅</span> 完全开源（MIT）</td>
+              <td><span class="status-cross">❌</span> 闭源</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-block">
+        <p>
+          <strong>结论：</strong>Hermes 是一个通用的 AI Agent 框架，而 Codex CLI 是一个专用的编码工具。
+          如果你需要的是一个能融入日常工作流、跨平台协作、不断进化的 AI 助手 —— Hermes 是更完整的选择。
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <span class="brand">AI赋能产品经理工作流</span>
+      <span class="page-num">16 / 17</span>
+    </div>
+  </div>
+</body>
+</html>
